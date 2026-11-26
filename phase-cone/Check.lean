@@ -1,0 +1,9 @@
+import GoldbachBoundaries.PhaseCone.SectorPoly
+import GoldbachBoundaries.Phi2.Proof.M5Boundary
+
+#print axioms GoldbachBoundaries.PhaseCone.sum_bKer_ne_zero_hinf_of_sector
+#print axioms GoldbachBoundaries.PhaseCone.sum_bKer_ne_zero_sector
+#print axioms GoldbachBoundaries.PhaseCone.sum_bKer_ne_zero_sector_of_poly
+#print axioms GoldbachBoundaries.PhaseCone.sum_bKer_ne_zero_sector_poly
+#print axioms GoldbachBoundaries.Phi2Proof.isNaturalBoundary_of_eventuallyEq_add
+#print axioms GoldbachBoundaries.Phi2HInf.sum_bKer_ne_zero_hinf

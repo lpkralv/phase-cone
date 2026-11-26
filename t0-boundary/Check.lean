@@ -1,0 +1,18 @@
+import GoldbachBoundaries.T0HInf.SectorBoundary
+
+#print axioms GoldbachBoundaries.PhaseCone.sum_bKer_ne_zero_sector_poly
+#print axioms GoldbachBoundaries.T0HInf.hasResidue_C
+#print axioms GoldbachBoundaries.T0HInf.meromorphicOn_C
+#print axioms GoldbachBoundaries.T0HInf.tendsto_eta_criticalC
+#print axioms GoldbachBoundaries.T0HInf.exists_cutoff
+#print axioms GoldbachBoundaries.T0HInf.L_explicit
+#print axioms GoldbachBoundaries.T0HInf.remainder_bound
+#print axioms GoldbachBoundaries.T0HInf.t0_mellin_sq
+#print axioms GoldbachBoundaries.T0HInf.meromorphicOn_W
+#print axioms GoldbachBoundaries.T0HInf.t0_hinf_continuation
+#print axioms GoldbachBoundaries.T0HInf.t0_reg_identity
+#print axioms GoldbachBoundaries.T0HInf.t0_hinf_natural_boundary_of_sector
+#print axioms GoldbachBoundaries.T0HInf.collisionAtom_ne_zero_of_large_of_sector
+#print axioms GoldbachBoundaries.T0HInf.criticalAtom_ne_zero_of_large_of_sector
+#print axioms GoldbachBoundaries.T0HInf.pair_family_ne_zero_of_large_of_sector
+#print axioms GoldbachBoundaries.T0HInf.summable_norm_zeroCoef

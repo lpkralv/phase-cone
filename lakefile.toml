@@ -1,0 +1,17 @@
+name = "GoldbachBoundaries"
+defaultTargets = ["GoldbachBoundaries"]
+
+[leanOptions]
+pp.unicode.fun = true
+autoImplicit = false
+relaxedAutoImplicit = false
+
+# PrimeNumberTheoremAnd (PNT+), pinned to a fixed commit; it fixes the Mathlib pin (v4.34.0).
+# Bump deliberately, when PNT+ bumps.
+[[require]]
+name = "PrimeNumberTheoremAnd"
+git = "https://github.com/AlexKontorovich/PrimeNumberTheoremAnd.git"
+rev = "c39a751132c88b6e8080b74c74023fd95b3d8be0"
+
+[[lean_lib]]
+name = "GoldbachBoundaries"

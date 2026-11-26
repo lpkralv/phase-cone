@@ -1,0 +1,48 @@
+import GoldbachBoundaries.PhaseCone.SectorPoly
+import GoldbachBoundaries.PhiR.RealPoint
+import GoldbachBoundaries.ResidueClass.RealPoint
+import GoldbachBoundaries.ResidueClass.Statement
+
+#print axioms GoldbachBoundaries.PhaseCone.sum_bKer_ne_zero_hinf_of_sector
+#print axioms GoldbachBoundaries.PhaseCone.sum_bKer_ne_zero_sector
+#print axioms GoldbachBoundaries.PhaseCone.sum_bKer_ne_zero_sector_of_poly
+#print axioms GoldbachBoundaries.PhaseCone.sum_bKer_ne_zero_sector_poly
+#print axioms GoldbachBoundaries.Phi2Proof.isNaturalBoundary_of_eventuallyEq_add
+#print axioms GoldbachBoundaries.Phi2HInf.sum_bKer_ne_zero_hinf
+#print axioms GoldbachBoundaries.PhiRProof.PhiRc_sub_phiRMain
+#print axioms GoldbachBoundaries.PhiRProof.phiR_sub_main_radial_limit
+#print axioms GoldbachBoundaries.PhiRProof.phiR_sub_main_real_limit
+#print axioms GoldbachBoundaries.ResidueClass.isNaturalBoundary_phi2_of_agrees
+#print axioms GoldbachBoundaries.ResidueClass.isNaturalBoundary_regularPart
+#print axioms GoldbachBoundaries.ResidueClass.tendsto_radial_phi2Continuation
+#print axioms GoldbachBoundaries.ResidueClass.tendsto_radial_regularPart
+#print axioms GoldbachBoundaries.ResidueClass.Gamma_mul_Phi2_eq
+#print axioms GoldbachBoundaries.ResidueClass.differentiableOn_holomorphicCorrection
+#print axioms GoldbachBoundaries.ResidueClass.eqOn_phi2Continuation
+#print axioms GoldbachBoundaries.ResidueClass.meromorphicOn_phi2Continuation
+#print axioms GoldbachBoundaries.ResidueClass.exists_nearby_pairResidue_ne_zero
+#print axioms GoldbachBoundaries.ResidueClass.norm_lineRemainder_le
+#print axioms GoldbachBoundaries.ResidueClass.smoothed_explicit_formula
+#print axioms GoldbachBoundaries.ResidueClass.meromorphic_W
+#print axioms GoldbachBoundaries.ResidueClass.D_eq_primitive_average
+#print axioms GoldbachBoundaries.ResidueClass.analyticOrderNatAt_lFunction_eq_primitiveMult
+#print axioms GoldbachBoundaries.ResidueClass.summable_norm_gammaWeight
+#print axioms GoldbachBoundaries.ResidueClass.Gamma_mul_PhiR_eq
+#print axioms GoldbachBoundaries.ResidueClass.eqOn_phiRContinuation
+#print axioms GoldbachBoundaries.ResidueClass.isNaturalBoundary_phiR_of_agrees
+#print axioms GoldbachBoundaries.ResidueClass.meromorphicOn_phiRContinuation
+#print axioms GoldbachBoundaries.ResidueClass.exists_ordinate_window_mass_bound
+#print axioms GoldbachBoundaries.ResidueClass.finite_W_poles_line_Icc
+#print axioms GoldbachBoundaries.ResidueClass.tendsto_radial_cauchySquare
+#print axioms GoldbachBoundaries.ResidueClass.phiR_sub_main_real_limit
+#print axioms GoldbachBoundaries.ResidueClass.D_eq_lSeries
+#print axioms GoldbachBoundaries.ResidueClass.phi2_natural_boundary
+#print axioms GoldbachBoundaries.ResidueClass.phiR_natural_boundary
+#print axioms GoldbachBoundaries.ResidueClass.exists_pairResidue_ne_zero
+#print axioms GoldbachBoundaries.ResidueClass.analyticAt_D
+#print axioms GoldbachBoundaries.ResidueClass.hasResidue_D
+#print axioms GoldbachBoundaries.ResidueClass.hasResidue_D_one
+#print axioms GoldbachBoundaries.ResidueClass.meromorphicOrderAt_D_of_pos_mult
+#print axioms GoldbachBoundaries.ResidueClass.meromorphicOrderAt_D_one
+#print axioms GoldbachBoundaries.ResidueClass.meromorphic_D
+#print axioms GoldbachBoundaries.ResidueClass.primitiveL_ne_zero_of_one_le_re
