@@ -14,7 +14,11 @@ The declaration lists omit shared Lean and Mathlib vocabulary such as `Complex.G
 
 ## Release
 
-Repository: https://github.com/lpkralv/phase-cone (release tag `v1.0`). One build from a clean clone checks the Lean results of all three papers. The papers' Hexagon identifiers and Zenodo DOIs will be listed here once the papers are posted.
+Repository: https://github.com/lpkralv/phase-cone (release tag `v1.0`). One build from a clean clone checks the Lean results of all three papers. The papers are posted on Hexagon and Zenodo:
+
+- Phase cones for Gamma-weighted atoms of additive Dirichlet series: [hexagon:2611.01111](https://hexagonmath.org/2611.01111), doi:[10.5281/zenodo.24550714](https://doi.org/10.5281/zenodo.24550714)
+- The natural boundary of the filtered prime-pair Dirichlet series: [hexagon:2611.01112](https://hexagonmath.org/2611.01112), doi:[10.5281/zenodo.24551160](https://doi.org/10.5281/zenodo.24551160)
+- Natural boundaries and real-point limits for class-one Goldbach series: [hexagon:2611.01114](https://hexagonmath.org/2611.01114), doi:[10.5281/zenodo.24551268](https://doi.org/10.5281/zenodo.24551268)
 
 ## Build and check
 
