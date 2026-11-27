@@ -26,12 +26,12 @@ private theorem ordinate_window_ncard_le {V B : ℝ}
 /-- For each sufficiently high unit interval choose one height that separates
 both horizontal sides from every ordinate. The separation is bounded below
 by the reciprocal of an affine function of the logarithm of the height. -/
-theorem exists_selected_height (hGRH : GRH q) :
+theorem exists_selected_height_unconditional (q : ℕ) [NeZero q] :
     ∃ K : ℝ, 0 ≤ K ∧ ∀ Y : ℝ, 2 ≤ Y → ∃ H ∈ Icc Y (Y + 1),
       ∀ t ∈ Ordinates q, 1 / (2 + K * Real.log (Y + 6)) ≤ |H - t| ∧
         1 / (2 + K * Real.log (Y + 6)) ≤ |-H - t| := by
   classical
-  obtain ⟨C, hC, hmass⟩ := exists_ordinate_window_mass_bound hGRH
+  obtain ⟨C, hC, hmass⟩ := exists_ordinate_window_mass_bound_unconditional q
   refine ⟨12 * C, by positivity, fun Y hY ↦ ?_⟩
   let c (i : Fin 3) : ℝ := Y - 1 / 2 + i.val
   let W (V : ℝ) := Ordinates q ∩ Icc (V - 1 / 2) (V + 1 / 2)
@@ -112,5 +112,11 @@ theorem exists_selected_height (hGRH : GRH q) :
   rw [← abs_neg]
   congr 1
   ring
+
+theorem exists_selected_height (hGRH : GRH q) :
+    ∃ K : ℝ, 0 ≤ K ∧ ∀ Y : ℝ, 2 ≤ Y → ∃ H ∈ Icc Y (Y + 1),
+      ∀ t ∈ Ordinates q, 1 / (2 + K * Real.log (Y + 6)) ≤ |H - t| ∧
+        1 / (2 + K * Real.log (Y + 6)) ≤ |-H - t| :=
+  exists_selected_height_unconditional q
 
 end GoldbachBoundaries.ResidueClass

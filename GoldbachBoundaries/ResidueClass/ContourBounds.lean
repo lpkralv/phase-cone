@@ -37,35 +37,38 @@ variable [NeZero q]
 
 /-- If a high point is at distance at least `d` from the critical points, the
 same local bound holds for the average up to a bounded Euler correction. -/
-private theorem exists_norm_D_le_of_separated {δ : ℝ} (hδ : 0 < δ)
-    (hGRH : GRH q) (hZ3 : Paper2.Z3) (hLocal : LogDerivPrimitiveLocal q) :
-    ∃ A B E T₀ : ℝ, 0 ≤ A ∧ 0 ≤ B ∧ 0 ≤ E ∧ 2 ≤ T₀ ∧
+private theorem exists_norm_D_le_of_separated_of_high_critical {δ : ℝ} (hδ : 0 < δ)
+    {T : ℝ}
+    (hline : ∀ (χ : DirichletCharacter ℂ q) ρ, ρ ∈ primitiveZeros χ →
+      T ≤ |ρ.im| → ρ.re = 1 / 2) (hZ3 : Paper2.Z3) (hLocal : LogDerivPrimitiveLocal q) :
+    ∃ A B E T₀ : ℝ, 0 ≤ A ∧ 0 ≤ B ∧ 0 ≤ E ∧ 2 ≤ T₀ ∧ T < T₀ ∧
       ∀ (z : ℂ) (d : ℝ), 0 < d → δ ≤ z.re → z.re ≤ 2 → T₀ ≤ |z.im| →
         (∀ t ∈ Ordinates q, d ≤ ‖z - criticalPoint t‖) →
         ‖D q z‖ ≤ A * Real.log (2 + |z.im|) + B * Real.log (|z.im| + 4) / d + E := by
-  obtain ⟨A, B, T₀, hA, hB, hT, hlog⟩ :=
-    exists_norm_logDeriv_primitive_le_of_separated hGRH hZ3 hLocal
+  obtain ⟨A, B, T₀, hA, hB, hT, hTT, hlog⟩ :=
+    exists_norm_logDeriv_primitive_le_of_separated_of_high_critical hline hZ3 hLocal
   let E : ℝ := ∑ p ∈ q.primeFactors, Real.log p / (1 - (p : ℝ) ^ (-δ))
   let K : ℝ := ‖(q.totient : ℂ)⁻¹‖ * Fintype.card (DirichletCharacter ℂ q)
   have hE : 0 ≤ E := (norm_nonneg _).trans (norm_eulerCorrection_le hδ
     (1 : DirichletCharacter ℂ q) (show δ ≤ (δ : ℂ).re by simp))
   have hK : 0 ≤ K := by positivity
   refine ⟨K * A, K * B, K * E, T₀, mul_nonneg hK hA, mul_nonneg hK hB,
-    mul_nonneg hK hE, hT, fun z d hd hz hz₂ hy hdist ↦ ?_⟩
+    mul_nonneg hK hE, hT, by linarith, fun z d hd hz hz₂ hy hdist ↦ ?_⟩
   have hz₁ : z ≠ 1 := by
     rintro rfl
     simp at hy
     linarith
-  have hpoint (χ : DirichletCharacter ℂ q) (ρ : ℂ) (hρ : ρ ∈ primitiveZeros χ) :
+  have hpoint (χ : DirichletCharacter ℂ q) (ρ : ℂ) (hρ : ρ ∈ primitiveZeros χ)
+      (hnear : |ρ.im - z.im| ≤ 1) :
       d ≤ ‖z - ρ‖ := by
     have he : criticalPoint ρ.im = ρ :=
-      Complex.ext (by rw [criticalPoint_re, hGRH χ ρ hρ]) (criticalPoint_im _)
+      Complex.ext (by rw [criticalPoint_re, hline χ ρ hρ (by linarith [abs_sub_abs_le_abs_sub z.im ρ.im, abs_sub_comm z.im ρ.im])]) (criticalPoint_im _)
     exact he ▸ hdist ρ.im (mem_Ordinates_iff.mpr ⟨χ, he.symm ▸ hρ⟩)
   have hne (χ : DirichletCharacter ℂ q) : primitiveL χ z ≠ 0 := by
     by_cases hz' : 1 ≤ z.re
     · exact primitiveL_ne_zero_of_one_le_re χ hz'
     · intro h
-      have := hpoint χ z ⟨h, hδ.trans_le hz, lt_of_not_ge hz'⟩
+      have := hpoint χ z ⟨h, hδ.trans_le hz, lt_of_not_ge hz'⟩ (by simp)
       simp at this
       linarith
   rw [D_eq_primitive_average (hδ.trans_le hz) hz₁ hne, norm_mul]
@@ -79,30 +82,34 @@ private theorem exists_norm_D_le_of_separated {δ : ℝ} (hδ : 0 < δ)
       rw [norm_neg]
       refine add_le_add (hlog χ z d hd (hδ.trans_le hz) hz₂ hy (hne χ) ?_)
         (norm_eulerCorrection_le hδ χ hz)
-      exact fun ρ hρ _ ↦ hpoint χ ρ hρ
+      exact fun ρ hρ hnear ↦ hpoint χ ρ hρ hnear
     _ = _ := by simp [K]; ring
 
 /-- On the left line each critical point is separated by the real-part gap. -/
-theorem analyticAt_D_left (hGRH : GRH q) {δ : ℝ} (hδ : 0 < δ) (hδ' : δ < 1 / 2)
+theorem analyticAt_D_left_of_left_of_zeros {δ : ℝ} (hδ : 0 < δ) (hδ' : δ < 1 / 2)
+    (hleft : ∀ (χ : DirichletCharacter ℂ q) ρ, ρ ∈ primitiveZeros χ → δ < ρ.re)
     {z : ℂ} (hz : z.re = δ) : AnalyticAt ℂ (D q) z := by
   have hne : z ≠ 1 := by
     rintro rfl
     rw [one_re] at hz
     linarith
   refine analyticAt_D (hz.symm ▸ hδ) hne fun χ h ↦ ?_
-  have hh := hGRH χ z ⟨h, hz.symm ▸ hδ, by linarith⟩
+  have hh := hleft χ z ⟨h, hz.symm ▸ hδ, by linarith⟩
   linarith
 
-theorem exists_norm_D_left_bound (hGRH : GRH q) (hZ3 : Paper2.Z3)
-    (hLocal : LogDerivPrimitiveLocal q) {δ : ℝ} (hδ : 0 < δ) (hδ' : δ < 1 / 2) :
+theorem exists_norm_D_left_bound_of_high_critical {T : ℝ}
+    (hline : ∀ (χ : DirichletCharacter ℂ q) ρ, ρ ∈ primitiveZeros χ →
+      T ≤ |ρ.im| → ρ.re = 1 / 2) (hZ3 : Paper2.Z3)
+    (hLocal : LogDerivPrimitiveLocal q) {δ : ℝ} (hδ : 0 < δ) (hδ' : δ < 1 / 2)
+    (hleft : ∀ (χ : DirichletCharacter ℂ q) ρ, ρ ∈ primitiveZeros χ → δ < ρ.re) :
     ∃ K : ℝ, ∀ y : ℝ, ‖D q (δ + y * I)‖ ≤ K * (1 + |y|) := by
-  obtain ⟨A, B, E, T₀, hA, hB, hE, hT, hbound⟩ :=
-    exists_norm_D_le_of_separated hδ hGRH hZ3 hLocal
+  obtain ⟨A, B, E, T₀, hA, hB, hE, hT, hTT, hbound⟩ :=
+    exists_norm_D_le_of_separated_of_high_critical hδ hline hZ3 hLocal
   let d : ℝ := 1 / 2 - δ
   have hd : 0 < d := sub_pos.mpr hδ'
   have hcont : Continuous (fun y : ℝ ↦ D q (δ + y * I)) := by
     rw [continuous_iff_continuousAt]
-    exact fun y ↦ (analyticAt_D_left hGRH hδ hδ' (z := δ + y * I) (by simp)).continuousAt.comp
+    exact fun y ↦ (analyticAt_D_left_of_left_of_zeros hδ hδ' hleft (z := δ + y * I) (by simp)).continuousAt.comp
       (f := fun u : ℝ ↦ (δ : ℂ) + u * I) (by fun_prop)
   obtain ⟨L, hL⟩ := (isCompact_Icc (a := -T₀) (b := T₀)).exists_bound_of_continuousOn
     hcont.continuousOn
@@ -136,26 +143,31 @@ theorem exists_norm_D_left_bound (hGRH : GRH q) (hZ3 : Paper2.Z3)
       _ ≤ max L 0 + (2 * A + 4 * (B / d) + E) := le_add_of_nonneg_right hC₀
       _ ≤ _ := le_mul_of_one_le_right (add_nonneg hL₀ hC₀) (by linarith [abs_nonneg y])
 
-theorem integrable_Gamma_mul_D_left (hGRH : GRH q) (hZ3 : Paper2.Z3)
-    (hLocal : LogDerivPrimitiveLocal q) {δ : ℝ} (hδ : 0 < δ) (hδ' : δ < 1 / 2) :
+theorem integrable_Gamma_mul_D_left_of_high_critical {T : ℝ}
+    (hline : ∀ (χ : DirichletCharacter ℂ q) ρ, ρ ∈ primitiveZeros χ →
+      T ≤ |ρ.im| → ρ.re = 1 / 2) (hZ3 : Paper2.Z3)
+    (hLocal : LogDerivPrimitiveLocal q) {δ : ℝ} (hδ : 0 < δ) (hδ' : δ < 1 / 2)
+    (hleft : ∀ (χ : DirichletCharacter ℂ q) ρ, ρ ∈ primitiveZeros χ → δ < ρ.re) :
     Integrable fun y : ℝ ↦ Gamma (δ + y * I) * D q (δ + y * I) := by
-  obtain ⟨K, hK⟩ := exists_norm_D_left_bound hGRH hZ3 hLocal hδ hδ'
+  obtain ⟨K, hK⟩ := exists_norm_D_left_bound_of_high_critical hline hZ3 hLocal hδ hδ' hleft
   refine TIdentity.integrable_Gamma_mul_of_bound hδ ?_ hK
   rw [continuous_iff_continuousAt]
-  exact fun y ↦ (analyticAt_D_left hGRH hδ hδ' (z := δ + y * I) (by simp)).continuousAt.comp
+  exact fun y ↦ (analyticAt_D_left_of_left_of_zeros hδ hδ' hleft (z := δ + y * I) (by simp)).continuousAt.comp
     (f := fun u : ℝ ↦ (δ : ℂ) + u * I) (by fun_prop)
 
 /-- Selected heights avoid every ordinate and bound the average on both
 horizontal sides by a quadratic polynomial. -/
-theorem exists_D_horizontal_bounds (hGRH : GRH q) (hZ3 : Paper2.Z3)
+theorem exists_D_horizontal_bounds_of_high_critical {T : ℝ}
+    (hline : ∀ (χ : DirichletCharacter ℂ q) ρ, ρ ∈ primitiveZeros χ →
+      T ≤ |ρ.im| → ρ.re = 1 / 2) (hZ3 : Paper2.Z3)
     (hLocal : LogDerivPrimitiveLocal q) {δ : ℝ} (hδ : 0 < δ) :
-    ∃ K Y₀ : ℝ, 0 ≤ K ∧ 2 ≤ Y₀ ∧ ∀ Y : ℝ, Y₀ ≤ Y → ∃ H ∈ Icc Y (Y + 1),
+    ∃ K Y₀ : ℝ, 0 ≤ K ∧ 2 ≤ Y₀ ∧ T < Y₀ ∧ ∀ Y : ℝ, Y₀ ≤ Y → ∃ H ∈ Icc Y (Y + 1),
       (∀ t ∈ Ordinates q, |t| ≠ H) ∧
       ∀ z : ℂ, δ ≤ z.re → z.re ≤ 2 → |z.im| = H → ‖D q z‖ ≤ K * (1 + H) ^ 2 := by
-  obtain ⟨C, hC, hselect⟩ := exists_selected_height hGRH
-  obtain ⟨A, B, E, T₀, hA, hB, hE, hT, hbound⟩ :=
-    exists_norm_D_le_of_separated hδ hGRH hZ3 hLocal
-  refine ⟨2 * A + 4 * B * (2 + 6 * C) + E, T₀, by positivity, hT, fun Y hY ↦ ?_⟩
+  obtain ⟨C, hC, hselect⟩ := exists_selected_height_unconditional q
+  obtain ⟨A, B, E, T₀, hA, hB, hE, hT, hTT, hbound⟩ :=
+    exists_norm_D_le_of_separated_of_high_critical hδ hline hZ3 hLocal
+  refine ⟨2 * A + 4 * B * (2 + 6 * C) + E, T₀, by positivity, hT, hTT, fun Y hY ↦ ?_⟩
   obtain ⟨H, hH, hsep⟩ := hselect Y (hT.trans hY)
   have hH₀ : 0 ≤ H := by linarith [hH.1]
   let M := 2 + C * Real.log (Y + 6)
@@ -191,5 +203,38 @@ theorem exists_D_horizontal_bounds (hGRH : GRH q) (hZ3 : Paper2.Z3)
     _ ≤ A * (2 * (1 + H)) + B * (4 * (1 + H)) * ((2 + 6 * C) * (1 + H)) + E := by gcongr
     _ = (2 * A) * (1 + H) + (4 * B * (2 + 6 * C)) * (1 + H) ^ 2 + E * 1 := by ring
     _ ≤ _ := by rw [add_mul, add_mul]; gcongr
+
+theorem analyticAt_D_left (hGRH : GRH q) {δ : ℝ} (hδ : 0 < δ) (hδ' : δ < 1 / 2)
+    {z : ℂ} (hz : z.re = δ) : AnalyticAt ℂ (D q) z :=
+  analyticAt_D_left_of_left_of_zeros hδ hδ' (fun χ ρ hρ ↦ by rw [hGRH χ ρ hρ]; exact hδ') hz
+
+theorem exists_norm_D_left_bound (hGRH : GRH q) (hZ3 : Paper2.Z3)
+    (hLocal : LogDerivPrimitiveLocal q) {δ : ℝ} (hδ : 0 < δ) (hδ' : δ < 1 / 2) :
+    ∃ K : ℝ, ∀ y : ℝ, ‖D q (δ + y * I)‖ ≤ K * (1 + |y|) :=
+  exists_norm_D_left_bound_of_high_critical (T := 0) (fun χ ρ hρ _ ↦ hGRH χ ρ hρ) hZ3 hLocal hδ hδ' (fun χ ρ hρ ↦ by rw [hGRH χ ρ hρ]; exact hδ')
+
+theorem integrable_Gamma_mul_D_left (hGRH : GRH q) (hZ3 : Paper2.Z3)
+    (hLocal : LogDerivPrimitiveLocal q) {δ : ℝ} (hδ : 0 < δ) (hδ' : δ < 1 / 2) :
+    Integrable fun y : ℝ ↦ Gamma (δ + y * I) * D q (δ + y * I) :=
+  integrable_Gamma_mul_D_left_of_high_critical (T := 0) (fun χ ρ hρ _ ↦ hGRH χ ρ hρ) hZ3 hLocal hδ hδ' (fun χ ρ hρ ↦ by rw [hGRH χ ρ hρ]; exact hδ')
+
+theorem exists_D_horizontal_bounds (hGRH : GRH q) (hZ3 : Paper2.Z3)
+    (hLocal : LogDerivPrimitiveLocal q) {δ : ℝ} (hδ : 0 < δ) :
+    ∃ K Y₀ : ℝ, 0 ≤ K ∧ 2 ≤ Y₀ ∧ ∀ Y : ℝ, Y₀ ≤ Y → ∃ H ∈ Icc Y (Y + 1),
+      (∀ t ∈ Ordinates q, |t| ≠ H) ∧
+      ∀ z : ℂ, δ ≤ z.re → z.re ≤ 2 → |z.im| = H → ‖D q z‖ ≤ K * (1 + H) ^ 2 := by
+  obtain ⟨K, Y₀, hK, hY, _, h⟩ := exists_D_horizontal_bounds_of_high_critical
+    (T := 0) (fun χ ρ hρ _ ↦ hGRH χ ρ hρ) hZ3 hLocal hδ
+  exact ⟨K, Y₀, hK, hY, h⟩
+
+private theorem exists_norm_D_le_of_separated {δ : ℝ} (hδ : 0 < δ)
+    (hGRH : GRH q) (hZ3 : Paper2.Z3) (hLocal : LogDerivPrimitiveLocal q) :
+    ∃ A B E T₀ : ℝ, 0 ≤ A ∧ 0 ≤ B ∧ 0 ≤ E ∧ 2 ≤ T₀ ∧
+      ∀ (z : ℂ) (d : ℝ), 0 < d → δ ≤ z.re → z.re ≤ 2 → T₀ ≤ |z.im| →
+        (∀ t ∈ Ordinates q, d ≤ ‖z - criticalPoint t‖) →
+        ‖D q z‖ ≤ A * Real.log (2 + |z.im|) + B * Real.log (|z.im| + 4) / d + E := by
+  obtain ⟨A, B, E, T₀, hA, hB, hE, hT, _, h⟩ := exists_norm_D_le_of_separated_of_high_critical hδ
+    (T := 0) (fun χ ρ hρ _ ↦ hGRH χ ρ hρ) hZ3 hLocal
+  exact ⟨A, B, E, T₀, hA, hB, hE, hT, h⟩
 
 end GoldbachBoundaries.ResidueClass

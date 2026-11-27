@@ -35,17 +35,17 @@ def pairPoint (q : ℕ) [NeZero q] (p : OrdinatePair q) : ℂ :=
 @[simp] theorem pairPoint_im (p : OrdinatePair q) : (pairPoint q p).im = (p.1 : ℝ) + p.2 := by
   simp [pairPoint, criticalPoint_im]
 
-theorem summable_norm_pairWeight (hGRH : GRH q) :
+theorem summable_norm_pairWeight_unconditional (q : ℕ) [NeZero q] :
     Summable (fun p : OrdinatePair q ↦ ‖pairWeight q p‖) :=
   Summable.mul_norm (f := fun t : Ordinates q ↦ gammaWeight q t)
     (g := fun t : Ordinates q ↦ gammaWeight q t)
-    (summable_norm_gammaWeight hGRH) (summable_norm_gammaWeight hGRH)
+    (summable_norm_gammaWeight_unconditional q) (summable_norm_gammaWeight_unconditional q)
 
 /-- The double Cauchy series on the half-plane to the right of all pair locations. -/
 def cauchySquare (q : ℕ) [NeZero q] (s : ℂ) : ℂ :=
   ∑' p : OrdinatePair q, pairWeight q p / (s - pairPoint q p)
 
-theorem differentiableOn_cauchySquare (hGRH : GRH q) :
+theorem differentiableOn_cauchySquare_unconditional (q : ℕ) [NeZero q] :
     DifferentiableOn ℂ (cauchySquare q) HH := by
   intro s hs
   have hs' : 1 < s.re := hs
@@ -59,7 +59,7 @@ theorem differentiableOn_cauchySquare (hGRH : GRH q) :
     linarith
   have hdif : DifferentiableOn ℂ (cauchySquare q) (halfPlane (1 + d)) := by
     apply Complex.differentiableOn_tsum_of_summable_norm
-      ((summable_norm_pairWeight hGRH).div_const d)
+      ((summable_norm_pairWeight_unconditional q).div_const d)
     · intro p z hz
       have hne : z - pairPoint q p ≠ 0 := norm_pos_iff.mp (hd.trans_le (hb p z hz))
       exact (differentiableWithinAt_const _).div (differentiableWithinAt_id.sub_const _) hne
@@ -71,14 +71,14 @@ theorem differentiableOn_cauchySquare (hGRH : GRH q) :
     (show s ∈ halfPlane (1 + d) by change 1 + d < s.re; dsimp [d]; linarith))).differentiableWithinAt
 
 /-- Termwise integration of the squared zero sum on the unit interval. -/
-theorem integral_zeroTerm_sq (hGRH : GRH q) {s : ℂ} (hs : 1 < s.re) :
+theorem integral_zeroTerm_sq_unconditional {s : ℂ} (hs : 1 < s.re) :
     IntegrableOn (fun x : ℝ ↦ zeroTerm q x ^ 2 * (x : ℂ) ^ (s - 1)) (Ioc 0 1) ∧
       (∫ x in Ioc (0 : ℝ) 1, zeroTerm q x ^ 2 * (x : ℂ) ^ (s - 1)) = cauchySquare q s := by
   have h := Phi2HInf.integral_cpow_family (pairWeight q) (pairPoint q)
-    (summable_norm_pairWeight hGRH) (fun p ↦ by simp) hs
+    (summable_norm_pairWeight_unconditional q) (fun p ↦ by simp) hs
   have heq (x : ℝ) (hx : x ∈ Ioc (0 : ℝ) 1) :
       zeroTerm q x ^ 2 = ∑' p : OrdinatePair q, pairWeight q p * (x : ℂ) ^ (-pairPoint q p) := by
-    have hsum := summable_norm_zeroTerm hGRH hx.1
+    have hsum := summable_norm_zeroTerm_unconditional (q := q) hx.1
     rw [pow_two, zeroTerm, tsum_mul_tsum_of_summable_norm hsum hsum]
     apply tsum_congr
     intro p
@@ -93,5 +93,18 @@ theorem aestronglyMeasurable_zeroTerm :
     AEStronglyMeasurable (zeroTerm q) (volume.restrict (Ioc 0 1)) :=
   AEStronglyMeasurable.tsum (fun t : Ordinates q ↦
     (Phi2Proof.C_cpow_meas (-criticalPoint t)).const_mul (gammaWeight q t))
+
+theorem summable_norm_pairWeight (hGRH : GRH q) :
+    Summable (fun p : OrdinatePair q ↦ ‖pairWeight q p‖) :=
+  summable_norm_pairWeight_unconditional q
+
+theorem differentiableOn_cauchySquare (hGRH : GRH q) :
+    DifferentiableOn ℂ (cauchySquare q) HH :=
+  differentiableOn_cauchySquare_unconditional q
+
+theorem integral_zeroTerm_sq (hGRH : GRH q) {s : ℂ} (hs : 1 < s.re) :
+    IntegrableOn (fun x : ℝ ↦ zeroTerm q x ^ 2 * (x : ℂ) ^ (s - 1)) (Ioc 0 1) ∧
+      (∫ x in Ioc (0 : ℝ) 1, zeroTerm q x ^ 2 * (x : ℂ) ^ (s - 1)) = cauchySquare q s :=
+  integral_zeroTerm_sq_unconditional hs
 
 end GoldbachBoundaries.ResidueClass

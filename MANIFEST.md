@@ -1,6 +1,6 @@
 # Lean source manifest
 
-The three paper maps cite declarations in 48 local source modules. Following their imports yields 654 modules, plus the `GoldbachBoundaries` entry point. The three `Check.lean` files are separate check programs.
+The three paper maps cite declarations in 54 local source modules. Following their imports yields 677 modules, plus the `GoldbachBoundaries` entry point. The three `Check.lean` files are separate check programs.
 
 The Lake toolchain and dependency lockfile match the source project. The release configuration lists `GoldbachBoundaries` as its only library and default target. The copied Lean modules keep their paths, declarations and proofs. Release edits remove private references from source comments.
 
@@ -8,7 +8,7 @@ The Lake toolchain and dependency lockfile match the source project. The release
 | --- | ---: | ---: |
 | [phase-cone](phase-cone/README.md) | 8 | 487 |
 | [t0-boundary](t0-boundary/README.md) | 14 | 626 |
-| [class-one](class-one/README.md) | 37 | 638 |
+| [class-one](class-one/README.md) | 43 | 648 |
 
 | Source group under `GoldbachBoundaries/` | Modules |
 | --- | ---: |
@@ -19,7 +19,7 @@ The Lake toolchain and dependency lockfile match the source project. The release
 | `Phi2` | 45 |
 | `Phi2HInf` | 45 |
 | `PhiR` | 31 |
-| `ResidueClass` | 25 |
+| `ResidueClass` | 35 |
 | `T0HInf` | 31 |
 | `TIdentity` | 17 |
 | `ThmA` | 64 |
@@ -564,19 +564,29 @@ The Lake toolchain and dependency lockfile match the source project. The release
 | [`GoldbachBoundaries.ResidueClass.Correction`](GoldbachBoundaries/ResidueClass/Correction.lean) |  |  | ● |
 | [`GoldbachBoundaries.ResidueClass.Definitions`](GoldbachBoundaries/ResidueClass/Definitions.lean) |  |  | ● |
 | [`GoldbachBoundaries.ResidueClass.EulerFactors`](GoldbachBoundaries/ResidueClass/EulerFactors.lean) |  |  | ● |
+| [`GoldbachBoundaries.ResidueClass.ExceptionalBinary`](GoldbachBoundaries/ResidueClass/ExceptionalBinary.lean) |  |  | ● |
+| [`GoldbachBoundaries.ResidueClass.ExceptionalHigher`](GoldbachBoundaries/ResidueClass/ExceptionalHigher.lean) |  |  | ● |
+| [`GoldbachBoundaries.ResidueClass.ExceptionalMellin`](GoldbachBoundaries/ResidueClass/ExceptionalMellin.lean) |  |  | ✓ |
+| [`GoldbachBoundaries.ResidueClass.ExceptionalZeros`](GoldbachBoundaries/ResidueClass/ExceptionalZeros.lean) |  |  | ● |
 | [`GoldbachBoundaries.ResidueClass.GammaWeights`](GoldbachBoundaries/ResidueClass/GammaWeights.lean) |  |  | ● |
 | [`GoldbachBoundaries.ResidueClass.HigherReduction`](GoldbachBoundaries/ResidueClass/HigherReduction.lean) |  |  | ● |
 | [`GoldbachBoundaries.ResidueClass.JensenCount`](GoldbachBoundaries/ResidueClass/JensenCount.lean) |  |  | ● |
 | [`GoldbachBoundaries.ResidueClass.LFunctionGrowth`](GoldbachBoundaries/ResidueClass/LFunctionGrowth.lean) |  |  | ✓ |
 | [`GoldbachBoundaries.ResidueClass.LocalLogDerivative`](GoldbachBoundaries/ResidueClass/LocalLogDerivative.lean) |  |  | ✓ |
+| [`GoldbachBoundaries.ResidueClass.LocalProved`](GoldbachBoundaries/ResidueClass/LocalProved.lean) |  |  | ● |
 | [`GoldbachBoundaries.ResidueClass.MellinSquare`](GoldbachBoundaries/ResidueClass/MellinSquare.lean) |  |  | ✓ |
 | [`GoldbachBoundaries.ResidueClass.PoleWindows`](GoldbachBoundaries/ResidueClass/PoleWindows.lean) |  |  | ● |
+| [`GoldbachBoundaries.ResidueClass.PrimitiveLocalProof`](GoldbachBoundaries/ResidueClass/PrimitiveLocalProof.lean) |  |  | ● |
+| [`GoldbachBoundaries.ResidueClass.PrimitiveReflection`](GoldbachBoundaries/ResidueClass/PrimitiveReflection.lean) |  |  | ✓ |
 | [`GoldbachBoundaries.ResidueClass.RadialLimit`](GoldbachBoundaries/ResidueClass/RadialLimit.lean) |  |  | ● |
 | [`GoldbachBoundaries.ResidueClass.RealPoint`](GoldbachBoundaries/ResidueClass/RealPoint.lean) |  |  | ● |
 | [`GoldbachBoundaries.ResidueClass.SelectedHeights`](GoldbachBoundaries/ResidueClass/SelectedHeights.lean) |  |  | ✓ |
 | [`GoldbachBoundaries.ResidueClass.Series`](GoldbachBoundaries/ResidueClass/Series.lean) |  |  | ● |
 | [`GoldbachBoundaries.ResidueClass.Smoothed`](GoldbachBoundaries/ResidueClass/Smoothed.lean) |  |  | ✓ |
 | [`GoldbachBoundaries.ResidueClass.Statement`](GoldbachBoundaries/ResidueClass/Statement.lean) |  |  | ● |
+| [`GoldbachBoundaries.ResidueClass.TwoBoundary`](GoldbachBoundaries/ResidueClass/TwoBoundary.lean) |  |  | ● |
+| [`GoldbachBoundaries.ResidueClass.TwoDeletionRemainder`](GoldbachBoundaries/ResidueClass/TwoDeletionRemainder.lean) |  |  | ✓ |
+| [`GoldbachBoundaries.ResidueClass.TwoEulerDeletion`](GoldbachBoundaries/ResidueClass/TwoEulerDeletion.lean) |  |  | ✓ |
 | [`GoldbachBoundaries.ResidueClass.WeightedCone`](GoldbachBoundaries/ResidueClass/WeightedCone.lean) |  |  | ● |
 | [`GoldbachBoundaries.ResidueClass.ZeroWindows`](GoldbachBoundaries/ResidueClass/ZeroWindows.lean) |  |  | ✓ |
 | [`GoldbachBoundaries.ResidueClass.Zeros`](GoldbachBoundaries/ResidueClass/Zeros.lean) |  |  | ● |

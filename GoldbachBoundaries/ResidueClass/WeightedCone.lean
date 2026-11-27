@@ -49,12 +49,12 @@ private theorem window_weight_le {C : ℝ}
 
 /-- Both orderings together contribute at most a constant times the squared
 logarithm to any unit bin. -/
-private theorem pair_bin_bound (hGRH : GRH q) {Y : ℝ} (hY : 0 < Y) :
+private theorem pair_bin_bound {Y : ℝ} (hY : 0 < Y) :
     ∃ K : ℝ, ∀ τ : ℝ, |τ| ≤ Y → ∀ v : ℝ, 0 ≤ v →
       (∑ᶠ p ∈ {p : pairFibre q τ | negativeHeight p ∈ Ico v (v + 1)},
         (pairMultiplicity p : ℝ)) ≤ K * Real.log (v + Y + 4) ^ 2 := by
   classical
-  obtain ⟨C, hC, hMass⟩ := exists_ordinate_window_mass_bound hGRH
+  obtain ⟨C, hC, hMass⟩ := exists_ordinate_window_mass_bound_unconditional q
   refine ⟨8 * C ^ 2, fun τ hτ v hv ↦ ?_⟩
   let L := Real.log (v + Y + 4)
   have hL : 0 ≤ L := Real.log_nonneg (by linarith)
@@ -187,12 +187,12 @@ private theorem lt_negativeHeight {U Y : ℝ} (hUY : Y + 1 ≤ U) (hY : 0 < Y) (
 
 /-- The abstract cone yields a nonzero summed residue if every representation
 comes from sufficiently large ordinates. -/
-theorem exists_pairResidue_ne_zero (hGRH : GRH q) (hStir : Phi2HInf.StirlingStrip) {Y : ℝ} (hY : 0 < Y) :
+theorem exists_pairResidue_ne_zero_unconditional (hStir : Phi2HInf.StirlingStrip) {Y : ℝ} (hY : 0 < Y) :
     ∃ U : ℝ, Y + 1 ≤ U ∧ ∀ τ : ℝ, |τ| ≤ Y →
       Nonempty (pairFibre q τ) →
       (∀ p : pairFibre q τ, U < |(p.1.1 : ℝ)| ∧ U < |(p.1.2 : ℝ)|) →
       pairResidue q τ ≠ 0 := by
-  obtain ⟨K, hBins⟩ := pair_bin_bound hGRH hY
+  obtain ⟨K, hBins⟩ := pair_bin_bound (q := q) hY
   obtain ⟨U, hU, hcone⟩ := Phi2HInf.sum_bKer_ne_zero_hinf hStir
     (B := 1 / 2) (K := K) (by norm_num) (by norm_num) hY
   refine ⟨U, hU, fun τ hτ ⟨p₀⟩ hp ↦ ?_⟩
@@ -223,5 +223,12 @@ theorem exists_pairResidue_ne_zero (hGRH : GRH q) (hStir : Phi2HInf.StirlingStri
   unfold pairResidue
   simp_rw [hval, tsum_mul_left]
   exact mul_ne_zero (pow_ne_zero _ hq₀) hn
+
+theorem exists_pairResidue_ne_zero (hGRH : GRH q) (hStir : Phi2HInf.StirlingStrip) {Y : ℝ} (hY : 0 < Y) :
+    ∃ U : ℝ, Y + 1 ≤ U ∧ ∀ τ : ℝ, |τ| ≤ Y →
+      Nonempty (pairFibre q τ) →
+      (∀ p : pairFibre q τ, U < |(p.1.1 : ℝ)| ∧ U < |(p.1.2 : ℝ)|) →
+      pairResidue q τ ≠ 0 :=
+  exists_pairResidue_ne_zero_unconditional hStir hY
 
 end GoldbachBoundaries.ResidueClass

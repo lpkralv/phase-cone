@@ -89,9 +89,9 @@ private theorem jensenFunction_outer_bound (V : ℝ) {z : ℂ}
 /-- At fixed modulus, the multiplicity of each inducing function in a
 length-one window is at most a constant times `log (|V| + 4)`, uniformly in
 the character and window centre. -/
-theorem exists_primitive_window_mass_bound (hGRH : GRH q) :
+theorem exists_critical_window_mass_bound (q : ℕ) [NeZero q] :
     ∃ C : ℝ, 0 ≤ C ∧ ∀ (χ : DirichletCharacter ℂ q) (V : ℝ),
-      (∑ᶠ ρ ∈ zeroWindow χ (V - 1 / 2) (V + 1 / 2), (primitiveMult χ ρ : ℝ)) ≤
+      (∑ᶠ ρ ∈ criticalWindow χ (V - 1 / 2) (V + 1 / 2), (primitiveMult χ ρ : ℝ)) ≤
         C * Real.log (|V| + 4) := by
   let B : ℝ := 5 * (q : ℝ) * max 1 ‖riemannZeta 2‖
   let gapLog : ℝ := Real.log (35 / 32)
@@ -135,7 +135,7 @@ theorem exists_primitive_window_mass_bound (hGRH : GRH q) :
   have hscale : Real.log B ≤ Real.log B / Real.log 4 * Real.log X := by
     rw [div_mul_eq_mul_div, le_div_iff₀ hlog4]
     exact mul_le_mul_of_nonneg_left hlogX hlogB
-  have hJ := primitive_window_mass_le_jensen χ hGRH V M hM (fun _ hz ↦ jensenFunction_outer_bound χ V hz)
+  have hJ := critical_window_mass_le_jensen χ V M hM (fun _ hz ↦ jensenFunction_outer_bound χ V hz)
   refine hJ.trans ?_
   change Real.log (M / ‖jensenFunction χ (2 + (V : ℂ) * I)‖) / gapLog ≤
     (Real.log B / Real.log 4 + 2) / gapLog * Real.log X
@@ -147,11 +147,20 @@ theorem exists_primitive_window_mass_bound (hGRH : GRH q) :
   push_cast
   nlinarith
 
+theorem exists_primitive_window_mass_bound (hGRH : GRH q) :
+    ∃ C : ℝ, 0 ≤ C ∧ ∀ (χ : DirichletCharacter ℂ q) (V : ℝ),
+      (∑ᶠ ρ ∈ zeroWindow χ (V - 1 / 2) (V + 1 / 2), (primitiveMult χ ρ : ℝ)) ≤
+        C * Real.log (|V| + 4) := by
+  obtain ⟨C, hC, hmass⟩ := exists_critical_window_mass_bound q
+  exact ⟨C, hC, fun χ V ↦ by
+    rw [← criticalWindow_eq_zeroWindow χ (fun ρ hρ ↦ hGRH χ ρ hρ.1)]
+    exact hmass χ V⟩
+
 /-- The aggregate count over distinct ordinates equals the sum of the
 individual multiplicity counts, including zeros shared by different characters. -/
-theorem ordinate_window_mass_eq_sum (hGRH : GRH q) (a b : ℝ) :
+theorem ordinate_window_mass_eq_critical_sum (q : ℕ) [NeZero q] (a b : ℝ) :
     (∑ᶠ t ∈ Ordinates q ∩ Icc a b, (ordinateWeight q t : ℝ)) =
-      ∑ χ : DirichletCharacter ℂ q, ∑ᶠ ρ ∈ zeroWindow χ a b, (primitiveMult χ ρ : ℝ) := by
+      ∑ χ : DirichletCharacter ℂ q, ∑ᶠ ρ ∈ criticalWindow χ a b, (primitiveMult χ ρ : ℝ) := by
   classical
   let S := Ordinates q ∩ Icc a b
   let F := finite_Ordinates_inter (q := q) a b
@@ -161,29 +170,29 @@ theorem ordinate_window_mass_eq_sum (hGRH : GRH q) (a b : ℝ) :
   rw [Finset.sum_comm]
   apply Finset.sum_congr rfl
   intro χ _
-  let T := criticalPoint ⁻¹' zeroWindow χ a b
+  let T := criticalPoint ⁻¹' criticalWindow χ a b
   have hne (t : ℝ) : criticalPoint t ≠ 1 := by
     intro h
     have hh := congrArg Complex.re h
     norm_num [criticalPoint_re] at hh
   have hS : T ⊆ S := by
     intro t ht
-    exact ⟨mem_Ordinates_iff.mpr ⟨χ, ht.1⟩, by simpa only [criticalPoint_im] using ht.2⟩
+    exact ⟨mem_Ordinates_iff.mpr ⟨χ, ht.1.1⟩, by simpa only [criticalPoint_im] using ht.1.2⟩
   have hS' : S ∩ Function.support (fun t ↦ (primitiveMult χ (criticalPoint t) : ℝ)) ⊆ T := by
     rintro t ⟨ht, hpos⟩
     have hp : 0 < primitiveMult χ (criticalPoint t) := by
       rw [Function.mem_support, Nat.cast_ne_zero] at hpos
       omega
     have hz := (primitiveMult_pos_iff χ (hne t)).mp hp
-    exact ⟨⟨hz, by norm_num [criticalPoint_re], by norm_num [criticalPoint_re]⟩,
-      by simpa only [criticalPoint_im] using ht.2⟩
-  have hbij : Set.BijOn criticalPoint T (zeroWindow χ a b) := by
+    exact ⟨⟨⟨hz, by norm_num [criticalPoint_re], by norm_num [criticalPoint_re]⟩,
+      by simpa only [criticalPoint_im] using ht.2⟩, criticalPoint_re t⟩
+  have hbij : Set.BijOn criticalPoint T (criticalWindow χ a b) := by
     refine ⟨fun _ h ↦ h, ?_, ?_⟩
     · intro t _ u _ he
       simpa only [criticalPoint_im] using congrArg Complex.im he
     · intro ρ hρ
       have he : criticalPoint ρ.im = ρ :=
-        Complex.ext (by rw [criticalPoint_re, hGRH χ ρ hρ.1]) (criticalPoint_im _)
+        Complex.ext (by rw [criticalPoint_re, show ρ.re = 1 / 2 from hρ.2]) (criticalPoint_im _)
       exact ⟨ρ.im, by simpa only [T, Set.mem_preimage, he] using hρ, he⟩
   have hEq : (∑ᶠ t ∈ T, (primitiveMult χ (criticalPoint t) : ℝ)) =
       ∑ t ∈ F.toFinset, (primitiveMult χ (criticalPoint t) : ℝ) := by
@@ -195,27 +204,42 @@ theorem ordinate_window_mass_eq_sum (hGRH : GRH q) (a b : ℝ) :
   exact finsum_mem_eq_of_bijOn _ hbij (fun _ _ ↦ rfl)
 
 /-- The existential-constant form of equation (11) of the binary proof. -/
-theorem exists_ordinate_window_mass_bound (hGRH : GRH q) :
+theorem exists_ordinate_window_mass_bound_unconditional (q : ℕ) [NeZero q] :
     ∃ C : ℝ, 0 ≤ C ∧ ∀ V : ℝ,
       (∑ᶠ t ∈ Ordinates q ∩ Icc (V - 1 / 2) (V + 1 / 2), (ordinateWeight q t : ℝ)) ≤
         C * Real.log (|V| + 4) := by
-  obtain ⟨C, hC, hmass⟩ := exists_primitive_window_mass_bound hGRH
+  obtain ⟨C, hC, hmass⟩ := exists_critical_window_mass_bound q
   refine ⟨(Fintype.card (DirichletCharacter ℂ q) : ℝ) * C, by positivity, fun V ↦ ?_⟩
-  rw [ordinate_window_mass_eq_sum hGRH]
+  rw [ordinate_window_mass_eq_critical_sum q]
   calc
     _ ≤ ∑ _χ : DirichletCharacter ℂ q, C * Real.log (|V| + 4) :=
       Finset.sum_le_sum fun χ _ ↦ hmass χ V
     _ = _ := by simp [mul_assoc]
 
+theorem ordinate_window_mass_eq_sum (hGRH : GRH q) (a b : ℝ) :
+    (∑ᶠ t ∈ Ordinates q ∩ Icc a b, (ordinateWeight q t : ℝ)) =
+      ∑ χ : DirichletCharacter ℂ q, ∑ᶠ ρ ∈ zeroWindow χ a b, (primitiveMult χ ρ : ℝ) := by
+  rw [ordinate_window_mass_eq_critical_sum q]
+  exact Finset.sum_congr rfl fun χ _ ↦ by
+    rw [criticalWindow_eq_zeroWindow χ (fun ρ hρ ↦ hGRH χ ρ hρ.1)]
+
+theorem exists_ordinate_window_mass_bound (hGRH : GRH q) :
+    ∃ C : ℝ, 0 ≤ C ∧ ∀ V : ℝ,
+      (∑ᶠ t ∈ Ordinates q ∩ Icc (V - 1 / 2) (V + 1 / 2), (ordinateWeight q t : ℝ)) ≤
+        C * Real.log (|V| + 4) :=
+  exists_ordinate_window_mass_bound_unconditional q
+
 /-- Two adjacent length-one windows give the radius-one bound used in the
 local expansion. The midpoint may be counted twice in the upper bound. -/
-theorem exists_primitive_unit_radius_mass_bound (hGRH : GRH q) :
-    ∃ C : ℝ, 0 ≤ C ∧ ∀ (χ : DirichletCharacter ℂ q) (V : ℝ),
+theorem exists_primitive_unit_radius_mass_bound_of_high_critical
+    {T : ℝ} (hline : ∀ (χ : DirichletCharacter ℂ q) ρ,
+      ρ ∈ primitiveZeros χ → T ≤ |ρ.im| → ρ.re = 1 / 2) :
+    ∃ C : ℝ, 0 ≤ C ∧ ∀ (χ : DirichletCharacter ℂ q) (V : ℝ), T + 1 ≤ |V| →
       (∑ᶠ ρ ∈ {ρ ∈ primitiveZeros χ | |ρ.im - V| ≤ 1}, (primitiveMult χ ρ : ℝ)) ≤
         C * Real.log (|V| + 4) := by
   classical
-  obtain ⟨C, hC, hmass⟩ := exists_primitive_window_mass_bound hGRH
-  refine ⟨4 * C, by positivity, fun χ V ↦ ?_⟩
+  obtain ⟨C, hC, hmass⟩ := exists_critical_window_mass_bound q
+  refine ⟨4 * C, by positivity, fun χ V hV ↦ ?_⟩
   let f : ℂ → ℝ := fun ρ ↦ (primitiveMult χ ρ : ℝ)
   let S := zeroWindow χ (V - 1) (V + 1)
   let A := zeroWindow χ (V - 1) V
@@ -232,6 +256,14 @@ theorem exists_primitive_unit_radius_mass_bound (hGRH : GRH q) :
       exact hρ (indicator_of_notMem hn _))
   have hmass₁ := hmass χ (V - 1 / 2)
   have hmass₂ := hmass χ (V + 1 / 2)
+  have hcrit (ρ : ℂ) (hρ : ρ ∈ primitiveZeros χ) (h : |ρ.im - V| ≤ 1) :
+      ρ.re = 1 / 2 := by
+    apply hline χ ρ hρ
+    linarith [abs_sub_abs_le_abs_sub V ρ.im, abs_sub_comm V ρ.im]
+  rw [criticalWindow_eq_zeroWindow χ (fun ρ hρ ↦
+    hcrit ρ hρ.1 (abs_le.mpr ⟨by linarith [hρ.2.1], by linarith [hρ.2.2]⟩))] at hmass₁
+  rw [criticalWindow_eq_zeroWindow χ (fun ρ hρ ↦
+    hcrit ρ hρ.1 (abs_le.mpr ⟨by linarith [hρ.2.1], by linarith [hρ.2.2]⟩))] at hmass₂
   rw [show V - 1 / 2 - 1 / 2 = V - 1 by ring,
     show V - 1 / 2 + 1 / 2 = V by ring] at hmass₁
   rw [show V + 1 / 2 - 1 / 2 = V by ring,
@@ -273,5 +305,13 @@ theorem exists_primitive_unit_radius_mass_bound (hGRH : GRH q) :
       have h₂ := mul_le_mul_of_nonneg_left
         (hlog (V + 1 / 2) (by rw [show V + 1 / 2 - V = 1 / 2 by ring]; norm_num)) hC
       linarith
+
+theorem exists_primitive_unit_radius_mass_bound (hGRH : GRH q) :
+    ∃ C : ℝ, 0 ≤ C ∧ ∀ (χ : DirichletCharacter ℂ q) (V : ℝ),
+      (∑ᶠ ρ ∈ {ρ ∈ primitiveZeros χ | |ρ.im - V| ≤ 1}, (primitiveMult χ ρ : ℝ)) ≤
+        C * Real.log (|V| + 4) := by
+  obtain ⟨C, hC, hm⟩ := exists_primitive_unit_radius_mass_bound_of_high_critical
+    (T := -1) (fun χ ρ hρ _ ↦ hGRH χ ρ hρ)
+  exact ⟨C, hC, fun χ V ↦ hm χ V (by linarith [abs_nonneg V])⟩
 
 end GoldbachBoundaries.ResidueClass

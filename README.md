@@ -14,11 +14,15 @@ The declaration lists omit shared Lean and Mathlib vocabulary such as `Complex.G
 
 ## Release
 
-Repository: https://github.com/lpkralv/phase-cone (release tag `v1.1`; release `v1.0` is the version the papers first cited). One build from a clean clone checks the Lean results of all three papers. The papers are posted on Hexagon and Zenodo:
+Repository: https://github.com/lpkralv/phase-cone (release tag `v1.2`; `v1.0` is the version the papers first cited, and class-one v3 cites `v1.2`). One build from a clean clone checks the Lean results of all three papers. The papers are posted on Hexagon and Zenodo:
 
 - Phase cones for Gamma-weighted atoms of additive Dirichlet series: [hexagon:2611.01111](https://hexagonmath.org/2611.01111), doi:[10.5281/zenodo.24550714](https://doi.org/10.5281/zenodo.24550714)
 - The natural boundary of the filtered prime-pair Dirichlet series: [hexagon:2611.01112](https://hexagonmath.org/2611.01112), doi:[10.5281/zenodo.24551160](https://doi.org/10.5281/zenodo.24551160)
 - Natural boundaries and real-point limits for class-one Goldbach series: [hexagon:2611.01114](https://hexagonmath.org/2611.01114), doi:[10.5281/zenodo.24551268](https://doi.org/10.5281/zenodo.24551268)
+
+## Changes in v1.2
+
+The primitive L-function local expansion is proved from GRH at the modulus or from finitely many off-line zeros. New class-one boundary theorems allow finitely many off-line zeros in place of GRH, and a separate result derives the boundary at `q = 2` by Euler deletion from the unrestricted series. The remaining classical estimates are explicit premises.
 
 ## Changes in v1.1
 

@@ -107,11 +107,20 @@ theorem jensenFunction_ne_zero_of_one_lt_re {z : ℂ} (hz : 1 < z.re) :
   exact ((differentiable_jensenFunction χ).analyticAt z).analyticOrderAt_eq_zero.mp
     ((analyticOrderAt_jensenFunction χ hz₁).trans horder)
 
+/-- A bounded window restricted to critical-line zeros. -/
+def criticalWindow (a b : ℝ) : Set ℂ :=
+  zeroWindow χ a b ∩ {ρ | ρ.re = 1 / 2}
+
+theorem criticalWindow_eq_zeroWindow {a b : ℝ}
+    (h : ∀ ρ ∈ zeroWindow χ a b, ρ.re = 1 / 2) :
+    criticalWindow χ a b = zeroWindow χ a b :=
+  inter_eq_left.mpr h
+
 /-- Jensen bounds the multiplicity in a window of length one in terms of a
 bound on the outer circle and the value at the centre. -/
-theorem primitive_window_mass_le_jensen (hGRH : GRH q) (V M : ℝ) (hM : 1 ≤ M)
+theorem critical_window_mass_le_jensen (V M : ℝ) (hM : 1 ≤ M)
     (hbound : ∀ z ∈ sphere (2 + (V : ℂ) * I) (7 / 4), ‖jensenFunction χ z‖ ≤ M) :
-    (∑ᶠ ρ ∈ zeroWindow χ (V - 1 / 2) (V + 1 / 2), (primitiveMult χ ρ : ℝ)) ≤
+    (∑ᶠ ρ ∈ criticalWindow χ (V - 1 / 2) (V + 1 / 2), (primitiveMult χ ρ : ℝ)) ≤
       Real.log (M / ‖jensenFunction χ (2 + (V : ℂ) * I)‖) / Real.log (35 / 32) := by
   classical
   let c : ℂ := 2 + (V : ℂ) * I
@@ -135,24 +144,25 @@ theorem primitive_window_mass_le_jensen (hGRH : GRH q) (V M : ℝ) (hM : 1 ≤ M
   refine le_trans ?_ hJ'
   rw [finsum_mem_def]
   refine finsum_le_finsum ?_ (hfin.subset fun z hz ↦ ?_) fun z ↦ ?_
-  · exact (finite_zeroWindow χ _ _).subset (by
+  · exact ((finite_zeroWindow χ (V - 1 / 2) (V + 1 / 2)).subset
+      (inter_subset_left : criticalWindow χ _ _ ⊆ _)).subset (by
       intro z hz
       by_contra hn
       exact hz (Set.indicator_of_notMem hn _))
   · intro hz'
     apply hz
     simp [hz']
-  · by_cases hz : z ∈ zeroWindow χ (V - 1 / 2) (V + 1 / 2)
+  · by_cases hz : z ∈ criticalWindow χ (V - 1 / 2) (V + 1 / 2)
     · rw [Set.indicator_of_mem hz]
       have hz₁ : z ≠ 1 := by
         intro h
-        have hlt := hz.1.2.2
+        have hlt := hz.1.1.2.2
         simp [h] at hlt
       have hz' : criticalPoint z.im = z :=
-        Complex.ext (by rw [criticalPoint_re, hGRH χ z hz.1]) (criticalPoint_im _)
+        Complex.ext (by rw [criticalPoint_re, show z.re = 1 / 2 from hz.2]) (criticalPoint_im _)
       have hzd : z ∈ disk := by
         rw [← hz']
-        exact criticalPoint_mem_jensen_disk (abs_le.mpr ⟨by linarith [hz.2.1], by linarith [hz.2.2]⟩)
+        exact criticalPoint_mem_jensen_disk (abs_le.mpr ⟨by linarith [hz.1.2.1], by linarith [hz.1.2.2]⟩)
       have hd : divs z = (primitiveMult χ z : ℤ) := by
         dsimp [divs]
         rw [MeromorphicOn.AnalyticOnNhd.divisor_apply (ha disk) hzd, analyticOrderAt_jensenFunction χ hz₁,
@@ -164,5 +174,12 @@ theorem primitive_window_mass_le_jensen (hGRH : GRH q) (V M : ℝ) (hM : 1 ≤ M
         MeromorphicOn.AnalyticOnNhd.divisor_nonneg (ha disk) z
       have hreal : (↑(0 : ℤ) : ℝ) ≤ (divs z : ℝ) := by exact_mod_cast hz_nonneg
       simpa only [Int.cast_zero] using hreal
+
+theorem primitive_window_mass_le_jensen (hGRH : GRH q) (V M : ℝ) (hM : 1 ≤ M)
+    (hbound : ∀ z ∈ sphere (2 + (V : ℂ) * I) (7 / 4), ‖jensenFunction χ z‖ ≤ M) :
+    (∑ᶠ ρ ∈ zeroWindow χ (V - 1 / 2) (V + 1 / 2), (primitiveMult χ ρ : ℝ)) ≤
+      Real.log (M / ‖jensenFunction χ (2 + (V : ℂ) * I)‖) / Real.log (35 / 32) := by
+  rw [← criticalWindow_eq_zeroWindow χ (fun ρ hρ ↦ hGRH χ ρ hρ.1)]
+  exact critical_window_mass_le_jensen χ V M hM hbound
 
 end GoldbachBoundaries.ResidueClass

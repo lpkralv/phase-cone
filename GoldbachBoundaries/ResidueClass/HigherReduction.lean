@@ -10,7 +10,7 @@ namespace GoldbachBoundaries.ResidueClass
 
 variable {q : ℕ} [NeZero q]
 
-private def principalTerm (q : ℕ) (x : ℝ) : ℂ := principalWeight q / (x : ℂ)
+def principalTerm (q : ℕ) (x : ℝ) : ℂ := principalWeight q / (x : ℂ)
 
 /-- The contribution of monomials containing at least three residual factors. -/
 def higherTail (q r : ℕ) (x : ℝ) : ℂ :=
@@ -110,6 +110,10 @@ private theorem higherTail_split {r : ℕ} (hr : 2 ≤ r) (x : ℝ) :
   rw [show principalTerm q x = b by rfl, hp0, hp1]
   ring
 
+private def higherRemainderWith (q r : ℕ) (M : ℂ → ℂ) (s : ℂ) : ℂ :=
+  M s + tailMellin q r s - binaryFactor q r * tailMellin q 2 (s - r + 2) -
+    linearFactor q r * tailMellin q 1 (s - r + 1)
+
 private def higherRemainder (q r : ℕ) (s : ℂ) : ℂ :=
   (∫ x in Ioc (0 : ℝ) 1, higherTail q r x * (x : ℂ) ^ (s - 1)) +
     tailMellin q r s - binaryFactor q r * tailMellin q 2 (s - r + 2) -
@@ -140,8 +144,9 @@ private theorem integral_power_split (q k : ℕ) (s : ℂ)
       (hI.mono_set Ioc_subset_Ioi_self) (hI.mono_set (Ioi_subset_Ioi zero_le_one))] <;> rfl
 
 /-- The Mellin reduction on the initial half-plane. -/
-theorem Gamma_mul_PhiR_eq (hGRH : GRH q) (hZ3 : Paper2.Z3) (hLocal : LogDerivPrimitiveLocal q)
-    {r : ℕ} (hr : 2 ≤ r) {s : ℂ} (hs : (r : ℝ) < s.re) :
+private theorem Gamma_mul_PhiR_eq_of_integrable_tail {r : ℕ} (hr : 2 ≤ r)
+    {s : ℂ} (hs : (r : ℝ) < s.re)
+    (hH : IntegrableOn (fun x : ℝ ↦ higherTail q r x * (x : ℂ) ^ (s - 1)) (Ioc 0 1)) :
     Gamma s * PhiR q r s =
       binaryFactor q r * (Gamma (s - r + 2) * Phi2 q (s - r + 2)) +
       linearFactor q r * (Gamma (s - r + 1) * D q (s - r + 1)) +
@@ -163,8 +168,6 @@ theorem Gamma_mul_PhiR_eq (hGRH : GRH q) (hZ3 : Paper2.Z3) (hLocal : LogDerivPri
   rw [integral_power_split q r s hR'] at hRV'
   rw [integral_power_split q 2 _ h₂] at h₂V
   rw [integral_power_split q 1 _ h₁'] at h₁V'
-  obtain ⟨C, hC⟩ := higherTail_bound hGRH hZ3 hLocal r
-  have hH := Phi2Proof.C_integrableOn_mellin (higherTail_meas q r) hC (s := s) (by linarith)
   have hP : -1 < (s - r - 1).re := by simp; linarith
   have hPt (x : ℝ) (hx : x ∈ Ioc (0 : ℝ) 1) :
       (smoothed q x : ℂ)^r * (x : ℂ) ^ (s - 1) =
@@ -202,8 +205,22 @@ theorem Gamma_mul_PhiR_eq (hGRH : GRH q) (hZ3 : Paper2.Z3) (hLocal : LogDerivPri
   simp only [div_eq_mul_inv]
   ring
 
+theorem Gamma_mul_PhiR_eq (hGRH : GRH q) (hZ3 : Paper2.Z3) (hLocal : LogDerivPrimitiveLocal q)
+    {r : ℕ} (hr : 2 ≤ r) {s : ℂ} (hs : (r : ℝ) < s.re) :
+    Gamma s * PhiR q r s =
+      binaryFactor q r * (Gamma (s - r + 2) * Phi2 q (s - r + 2)) +
+      linearFactor q r * (Gamma (s - r + 1) * D q (s - r + 1)) +
+      constantFactor q r / (s - r) + higherRemainder q r s := by
+  obtain ⟨C, hC⟩ := higherTail_bound hGRH hZ3 hLocal r
+  exact Gamma_mul_PhiR_eq_of_integrable_tail hr hs
+    (Phi2Proof.C_integrableOn_mellin (higherTail_meas q r) hC (s := s) (by linarith))
+
 private def higherCoefficient (q r : ℕ) (s : ℂ) : ℂ :=
   (Gamma s)⁻¹ * (binaryFactor q r * Gamma (s - r + 2))
+
+private def higherCorrectionWith (q r : ℕ) [NeZero q] (M : ℂ → ℂ) (s : ℂ) : ℂ :=
+  (Gamma s)⁻¹ * (linearFactor q r * (Gamma (s - r + 1) * D q (s - r + 1)) +
+    constantFactor q r / (s - r) + higherRemainderWith q r M s)
 
 private def higherCorrection (q r : ℕ) [NeZero q] (s : ℂ) : ℂ :=
   (Gamma s)⁻¹ * (linearFactor q r * (Gamma (s - r + 1) * D q (s - r + 1)) +
@@ -230,9 +247,9 @@ private theorem higherCoefficient_ne_zero {r : ℕ} (hr : 2 ≤ r) {s : ℂ} (hs
     (mul_ne_zero (Nat.cast_ne_zero.mpr (Nat.choose_pos hr).ne') (pow_ne_zero _ hc))
     (Gamma_ne_zero_of_re_pos (by simp; linarith)))
 
-private theorem meromorphicOn_higherCorrection (hGRH : GRH q) (hZ3 : Paper2.Z3)
-    (hLocal : LogDerivPrimitiveLocal q) {r : ℕ} (hr : 2 ≤ r) :
-    MeromorphicOn (higherCorrection q r) (halfPlane ((r : ℝ) - 3 / 2)) := by
+private theorem meromorphicOn_higherCorrectionWith {a : ℝ} {M : ℂ → ℂ}
+    (hM : MeromorphicOn M (halfPlane a)) {r : ℕ} (hr : 2 ≤ r) :
+    MeromorphicOn (higherCorrectionWith q r M) (halfPlane a) := by
   intro s hs
   have hm : MeromorphicAt (fun z ↦ Gamma z * D q z) (s - r + 1) :=
     (PhiRProof.meromorphicAt_Gamma _).mul (meromorphic_D _)
@@ -240,10 +257,26 @@ private theorem meromorphicOn_higherCorrection (hGRH : GRH q) (hZ3 : Paper2.Z3)
     hm.comp_analyticAt (g := fun z : ℂ ↦ z - r + 1) (by fun_prop)
   have hrat : MeromorphicAt (fun z : ℂ ↦ constantFactor q r / (z - r)) s :=
     (MeromorphicAt.const _ s).div (analyticAt_id.sub analyticAt_const).meromorphicAt
-  have hrem := (differentiableOn_higherRemainder hGRH hZ3 hLocal hr).analyticAt
-    ((isOpen_halfPlane _).mem_nhds hs)
+  have ht (k : ℕ) (hk : 1 ≤ k) (f : ℂ → ℂ) (hf : AnalyticAt ℂ f s) :
+      AnalyticAt ℂ (fun z ↦ tailMellin q k (f z)) s :=
+    ((differentiable_tailMellin hk).analyticAt (f s)).comp hf
+  have htR := ht r (by omega) id analyticAt_id
+  have ht₂ := (MeromorphicAt.const (binaryFactor q r) s).mul
+    (ht 2 (by omega) (fun z ↦ z - r + 2) (by fun_prop)).meromorphicAt
+  have ht₁ := (MeromorphicAt.const (linearFactor q r) s).mul
+    (ht 1 le_rfl (fun z ↦ z - r + 1) (by fun_prop)).meromorphicAt
+  have hrem := (((hM s hs).add htR.meromorphicAt).sub ht₂).sub ht₁
   exact (PhiRProof.analyticAt_inv_Gamma s).meromorphicAt.mul
-    ((((MeromorphicAt.const _ s).mul hshift).add hrat).add hrem.meromorphicAt)
+    ((((MeromorphicAt.const _ s).mul hshift).add hrat).add hrem)
+
+private theorem meromorphicOn_higherCorrection (hGRH : GRH q) (hZ3 : Paper2.Z3)
+    (hLocal : LogDerivPrimitiveLocal q) {r : ℕ} (hr : 2 ≤ r) :
+    MeromorphicOn (higherCorrection q r) (halfPlane ((r : ℝ) - 3 / 2)) := by
+  apply meromorphicOn_higherCorrectionWith (q := q)
+    (M := fun z ↦ ∫ x in Ioc (0 : ℝ) 1, higherTail q r x * (x : ℂ) ^ (z - 1)) _ hr
+  exact fun s hs ↦ ((TIdentity.differentiableOn_integral_Ioc_cpow (higherTail_meas q r)
+    (higherTail_bound hGRH hZ3 hLocal r).choose_spec).analyticAt
+      ((isOpen_halfPlane _).mem_nhds hs)).meromorphicAt
 
 theorem meromorphicOn_phiRContinuation (hGRH : GRH q) (hZ3 : Paper2.Z3)
     (hLocal : LogDerivPrimitiveLocal q) {r : ℕ} (hr : 2 ≤ r) :
@@ -275,6 +308,82 @@ theorem eqOn_phiRContinuation (hGRH : GRH q) (hZ3 : Paper2.Z3)
   unfold higherCoefficient higherCorrection
   ring
 
+/-- A meromorphic small-interval transform for the higher tail transfers the
+binary boundary to the higher series. -/
+theorem naturalBoundary_higher_of_mellin {r : ℕ} (hr : 2 ≤ r) {a : ℝ}
+    (ha : a < (r : ℝ) - 1) {M B : ℂ → ℂ}
+    (hM : MeromorphicOn M (halfPlane a))
+    (hMellin : ∀ s : ℂ, (r : ℝ) < s.re →
+      IntegrableOn (fun x : ℝ ↦ higherTail q r x * (x : ℂ) ^ (s - 1)) (Ioc 0 1) ∧
+      (∫ x in Ioc (0 : ℝ) 1, higherTail q r x * (x : ℂ) ^ (s - 1)) = M s)
+    (hB : MeromorphicOn B HH) (hInitB : EqOn B (Phi2 q) (halfPlane 2))
+    (hBoundary : IsNaturalBoundary B HH lineOne) :
+    (∃ F : ℂ → ℂ, MeromorphicOn F (halfPlane ((r : ℝ) - 1)) ∧
+      EqOn F (PhiR q r) (halfPlane r)) ∧
+    (∀ F : ℂ → ℂ, MeromorphicOn F (halfPlane ((r : ℝ) - 1)) →
+      F =ᶠ[codiscreteWithin (halfPlane r)] PhiR q r →
+      IsNaturalBoundary F (halfPlane ((r : ℝ) - 1)) (lineAt ((r : ℝ) - 1))) := by
+  let U := halfPlane ((r : ℝ) - 1)
+  let a' := max a ((r : ℝ) - 2)
+  have ha' : a' < (r : ℝ) - 1 := max_lt ha (by linarith)
+  let W := higherCorrectionWith q r M
+  let C := higherCoefficient q r
+  let F₀ : ℂ → ℂ := fun s ↦ W s + C s * B (s - r + 2)
+  have hW : MeromorphicOn W (halfPlane a') :=
+    fun s hs ↦ meromorphicOn_higherCorrectionWith (q := q) hM hr s (by
+      show a < s.re
+      exact (le_max_left a ((r : ℝ) - 2)).trans_lt (show a' < s.re from hs))
+  have hcoeff (s : ℂ) (hs : s ∈ halfPlane a') : (r : ℝ) - 2 < s.re :=
+    (le_max_right _ _).trans_lt hs
+  have hF₀ : MeromorphicOn F₀ U := by
+    intro s hs
+    have hs' : (r : ℝ) - 1 < s.re := hs
+    have hs'' : s ∈ halfPlane a' := ha'.trans hs'
+    have hB' : MeromorphicAt (fun z : ℂ ↦ B (z - r + 2)) s :=
+      (hB _ (show 1 < (s - r + 2).re by simp; linarith)).comp_analyticAt
+        (g := fun z : ℂ ↦ z - r + 2) (by fun_prop)
+    exact (hW s hs'').add ((analyticAt_higherCoefficient (hcoeff s hs'')).meromorphicAt.mul hB')
+  have hInit : EqOn F₀ (PhiR q r) (halfPlane r) := by
+    intro s hs
+    have hs' : (r : ℝ) < s.re := hs
+    obtain ⟨hI, hIv⟩ := hMellin s hs'
+    have he := Gamma_mul_PhiR_eq_of_integrable_tail hr hs' hI
+    unfold higherRemainder at he
+    rw [hIv, ← hInitB (show 2 < (s - r + 2).re by simp; linarith)] at he
+    have hΓ : Gamma s ≠ 0 := Gamma_ne_zero_of_re_pos (by linarith [Nat.cast_nonneg (α := ℝ) r])
+    have h := congrArg (fun w ↦ (Gamma s)⁻¹ * w) he
+    change (Gamma s)⁻¹ * (Gamma s * PhiR q r s) = _ at h
+    rw [← mul_assoc, inv_mul_cancel₀ hΓ, one_mul] at h
+    rw [h]
+    unfold F₀ W C higherCorrectionWith higherCoefficient higherRemainderWith
+    ring
+  refine ⟨⟨F₀, hF₀, hInit⟩, fun F hF hAgree z hz ↦ ?_⟩
+  have hz' : z.re = (r : ℝ) - 1 := hz
+  have hEq₀ := Phi2Proof.eventuallyEq_codiscreteWithin_of_nhdsNE fun s hs ↦
+    PhiRProof.eventuallyEq_nhdsNE_of_agree_halfPlane (by linarith) hF hF₀ hInit hAgree hs
+  let c : ℝ := (r : ℝ) - 2
+  have hEq : F =ᶠ[codiscreteWithin U] fun s ↦ W s + C s * B (s - (c : ℂ)) := by
+    filter_upwards [hEq₀] with s hs
+    have he : s - (c : ℂ) = s - r + 2 := by simp [c]; ring
+    simpa only [F₀, he] using hs
+  have hzW : z ∈ halfPlane a' := by show a' < z.re; rwa [hz']
+  apply (PhiRProof.noMeromorphicExtensionAt_iff_of_eq_add_mul (isOpen_halfPlane _) hzW hW
+    (fun s hs ↦ analyticAt_higherCoefficient (hcoeff s hs))
+    (fun s hs ↦ higherCoefficient_ne_zero hr (hcoeff s hs)) hEq).mpr
+  have hp : (fun s : ℂ ↦ s - (c : ℂ)) ⁻¹' HH = U := by
+    rw [PhiRProof.preimage_sub_halfPlane]
+    congr 1
+    dsimp [c]
+    ring
+  have htrans := PhiRProof.noMeromorphicExtensionAt_comp_sub_iff (H := B) (U := HH)
+    (z₀ := z - (c : ℂ)) (c := (c : ℂ))
+  rw [sub_add_cancel, hp] at htrans
+  apply htrans.mpr
+  apply hBoundary
+  change (z - (c : ℂ)).re = 1
+  simp [c, hz']
+  ring
+
 /-- Any higher continuation agreeing on the initial half-plane has the shifted boundary. -/
 theorem isNaturalBoundary_phiR_of_agrees (hGRH : GRH q) (hZ3 : Paper2.Z3)
     (hLocal : LogDerivPrimitiveLocal q) (hGap : Paper2.ZLittlewood) (hStir : Phi2HInf.StirlingStrip)
@@ -282,43 +391,18 @@ theorem isNaturalBoundary_phiR_of_agrees (hGRH : GRH q) (hZ3 : Paper2.Z3)
     (hF : MeromorphicOn F (halfPlane ((r : ℝ) - 1)))
     (hAgree : F =ᶠ[codiscreteWithin (halfPlane r)] PhiR q r) :
     IsNaturalBoundary F (halfPlane ((r : ℝ) - 1)) (lineAt ((r : ℝ) - 1)) := by
-  intro z hz
-  have hz' : z.re = (r : ℝ) - 1 := hz
-  let c : ℝ := (r : ℝ) - 2
-  have hE := Phi2Proof.eventuallyEq_codiscreteWithin_of_nhdsNE fun s hs ↦
-    PhiRProof.eventuallyEq_nhdsNE_of_agree_halfPlane (by linarith)
-      hF (meromorphicOn_phiRContinuation hGRH hZ3 hLocal hr)
-      (eqOn_phiRContinuation hGRH hZ3 hLocal hr) hAgree hs
-  have hEq : F =ᶠ[codiscreteWithin (halfPlane ((r : ℝ) - 1))]
-      fun s ↦ higherCorrection q r s + higherCoefficient q r s * phi2Continuation q (s - (c : ℂ)) := by
-    filter_upwards [hE] with s hs
-    rw [hs, phiRContinuation]
-    have he : s - (c : ℂ) = s - r + 2 := by simp [c]; ring
-    rw [he]
-  have hW : z ∈ halfPlane ((r : ℝ) - 3 / 2) := by change _ < z.re; linarith
-  have hcoef (s : ℂ) (hs : s ∈ halfPlane ((r : ℝ) - 3 / 2)) : (r : ℝ) - 2 < s.re := by
-    change _ < s.re at hs
-    linarith
-  apply (PhiRProof.noMeromorphicExtensionAt_iff_of_eq_add_mul (isOpen_halfPlane _) hW
-    (meromorphicOn_higherCorrection hGRH hZ3 hLocal hr)
-    (fun s hs ↦ analyticAt_higherCoefficient (hcoef s hs))
-    (fun s hs ↦ higherCoefficient_ne_zero hr (hcoef s hs)) hEq).mpr
-  have hp : (fun s : ℂ ↦ s - (c : ℂ)) ⁻¹' HH = halfPlane ((r : ℝ) - 1) := by
-    rw [PhiRProof.preimage_sub_halfPlane]
-    congr 1
-    dsimp [c]
-    ring
-  have htrans := PhiRProof.noMeromorphicExtensionAt_comp_sub_iff (H := phi2Continuation q) (U := HH)
-    (z₀ := z - (c : ℂ)) (c := (c : ℂ))
-  rw [sub_add_cancel, hp] at htrans
-  apply htrans.mpr
-  have hInitial : phi2Continuation q =ᶠ[codiscreteWithin (halfPlane 2)] Phi2 q := by
-    filter_upwards [self_mem_codiscreteWithin (halfPlane 2)] with s hs
-    exact eqOn_phi2Continuation hGRH hZ3 hLocal hs
-  apply isNaturalBoundary_phi2_of_agrees hGRH hZ3 hLocal hGap hStir _
-    (meromorphicOn_phi2Continuation hGRH hZ3 hLocal) hInitial
-  change (z - (c : ℂ)).re = 1
-  simp [c, hz']
-  <;> ring
+  let M : ℂ → ℂ := fun s ↦ ∫ x in Ioc (0 : ℝ) 1, higherTail q r x * (x : ℂ) ^ (s - 1)
+  obtain ⟨K, hK⟩ := higherTail_bound hGRH hZ3 hLocal r
+  have hD := TIdentity.differentiableOn_integral_Ioc_cpow (higherTail_meas q r) hK
+  have hM : MeromorphicOn M (halfPlane ((r : ℝ) - 3 / 2)) :=
+    fun s hs ↦ (hD.analyticAt ((isOpen_halfPlane _).mem_nhds hs)).meromorphicAt
+  have hInit := eqOn_phi2Continuation hGRH hZ3 hLocal
+  have hB := meromorphicOn_phi2Continuation hGRH hZ3 hLocal
+  have hAgreeB : phi2Continuation q =ᶠ[codiscreteWithin (halfPlane 2)] Phi2 q := by
+    filter_upwards [self_mem_codiscreteWithin (halfPlane 2)] with s hs using hInit hs
+  have hbound := isNaturalBoundary_phi2_of_agrees hGRH hZ3 hLocal hGap hStir _ hB hAgreeB
+  exact (naturalBoundary_higher_of_mellin hr (by linarith) hM
+    (fun s hs ↦ ⟨Phi2Proof.C_integrableOn_mellin (higherTail_meas q r) hK
+      (s := s) (by linarith), rfl⟩) hB hInit hbound).2 F hF hAgree
 
 end GoldbachBoundaries.ResidueClass

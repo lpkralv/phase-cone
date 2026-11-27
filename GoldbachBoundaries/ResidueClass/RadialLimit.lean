@@ -29,7 +29,7 @@ theorem pairPoint_eq_iff (p : OrdinatePair q) (τ : ℝ) :
 
 /-- The radial limit exists at every point and equals the sum over its exact
 ordered representations. The absolute Gamma-weight sum dominates the limit. -/
-theorem tendsto_radial_cauchySquare (hGRH : GRH q) (τ : ℝ) :
+theorem tendsto_radial_cauchySquare_unconditional (τ : ℝ) :
     Tendsto (fun η : ℝ ↦ (η : ℂ) * cauchySquare q (1 + τ * I + η))
       (𝓝[>] 0) (𝓝 (pairResidue q τ)) := by
   classical
@@ -67,10 +67,15 @@ theorem tendsto_radial_cauchySquare (hGRH : GRH q) (τ : ℝ) :
     rw [norm_mul, norm_div, norm_real, Real.norm_of_nonneg hη₀.le,
       mul_div_assoc', div_le_iff₀ hp]
     simpa only [mul_comm] using mul_le_mul_of_nonneg_right hnorm (norm_nonneg (pairWeight q p))
-  have h := tendsto_tsum_of_dominated_convergence (summable_norm_pairWeight hGRH) hlim hbound
+  have h := tendsto_tsum_of_dominated_convergence (summable_norm_pairWeight_unconditional q) hlim hbound
   have hL : (∑' p, L p) = pairResidue q τ :=
     (tsum_subtype (pairFibre q τ) (pairWeight q)).symm
   rw [hL] at h
   simpa only [F, cauchySquare, z, tsum_mul_left] using h
+
+theorem tendsto_radial_cauchySquare (hGRH : GRH q) (τ : ℝ) :
+    Tendsto (fun η : ℝ ↦ (η : ℂ) * cauchySquare q (1 + τ * I + η))
+      (𝓝[>] 0) (𝓝 (pairResidue q τ)) :=
+  tendsto_radial_cauchySquare_unconditional (q := q) τ
 
 end GoldbachBoundaries.ResidueClass

@@ -23,10 +23,10 @@ private theorem floor_mem_window (t : ℝ) :
 
 /-- The length-one multiplicity bound and third-order Gamma decay give a summable
 majorant after grouping the ordinates by integer part. -/
-theorem summable_norm_gammaWeight (hGRH : GRH q) :
+theorem summable_norm_gammaWeight_unconditional (q : ℕ) [NeZero q] :
     Summable (fun t : Ordinates q ↦ ‖gammaWeight q t‖) := by
   classical
-  obtain ⟨C, hC, hmass⟩ := exists_ordinate_window_mass_bound hGRH
+  obtain ⟨C, hC, hmass⟩ := exists_ordinate_window_mass_bound_unconditional q
   obtain ⟨G, hG⟩ := TIdentity.norm_Gamma_mul_one_add_abs_im_pow_le
     (a := 1 / 2) (a' := 1 / 2) (by norm_num) 3
   let floorOrd (t : Ordinates q) : ℤ := ⌊(t : ℝ)⌋
@@ -113,14 +113,26 @@ theorem summable_norm_gammaWeight (hGRH : GRH q) :
 def zeroTerm (q : ℕ) [NeZero q] (x : ℝ) : ℂ :=
   ∑' t : Ordinates q, gammaWeight q t * (x : ℂ) ^ (-criticalPoint t)
 
-theorem summable_norm_zeroTerm (hGRH : GRH q) {x : ℝ} (hx : 0 < x) :
+theorem summable_norm_zeroTerm_unconditional {x : ℝ} (hx : 0 < x) :
     Summable (fun t : Ordinates q ↦ ‖gammaWeight q t * (x : ℂ) ^ (-criticalPoint t)‖) := by
-  refine ((summable_norm_gammaWeight hGRH).mul_right (x ^ (-(1 / 2) : ℝ))).congr fun t ↦ ?_
+  refine ((summable_norm_gammaWeight_unconditional q).mul_right (x ^ (-(1 / 2) : ℝ))).congr fun t ↦ ?_
   rw [norm_mul, norm_cpow_eq_rpow_re_of_pos hx, neg_re, criticalPoint_re]
 
-theorem norm_zeroTerm_le (hGRH : GRH q) {x : ℝ} (hx : 0 < x) :
+theorem norm_zeroTerm_le_unconditional {x : ℝ} (hx : 0 < x) :
     ‖zeroTerm q x‖ ≤ (∑' t : Ordinates q, ‖gammaWeight q t‖) * x ^ (-(1 / 2) : ℝ) := by
-  refine (norm_tsum_le_tsum_norm (summable_norm_zeroTerm hGRH hx)).trans_eq ?_
+  refine (norm_tsum_le_tsum_norm (summable_norm_zeroTerm_unconditional hx)).trans_eq ?_
   simp_rw [norm_mul, norm_cpow_eq_rpow_re_of_pos hx, neg_re, criticalPoint_re, tsum_mul_right]
+
+theorem summable_norm_gammaWeight (hGRH : GRH q) :
+    Summable (fun t : Ordinates q ↦ ‖gammaWeight q t‖) :=
+  summable_norm_gammaWeight_unconditional q
+
+theorem summable_norm_zeroTerm (hGRH : GRH q) {x : ℝ} (hx : 0 < x) :
+    Summable (fun t : Ordinates q ↦ ‖gammaWeight q t * (x : ℂ) ^ (-criticalPoint t)‖) :=
+  summable_norm_zeroTerm_unconditional hx
+
+theorem norm_zeroTerm_le (hGRH : GRH q) {x : ℝ} (hx : 0 < x) :
+    ‖zeroTerm q x‖ ≤ (∑' t : Ordinates q, ‖gammaWeight q t‖) * x ^ (-(1 / 2) : ℝ) :=
+  norm_zeroTerm_le_unconditional hx
 
 end GoldbachBoundaries.ResidueClass

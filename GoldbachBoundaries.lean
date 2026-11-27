@@ -6,4 +6,6 @@ import GoldbachBoundaries.PhiR.UnsubtractedGap
 import GoldbachBoundaries.PhiR.UnsubtractedFinal
 import GoldbachBoundaries.ResidueClass.RealPoint
 import GoldbachBoundaries.ResidueClass.Statement
+import GoldbachBoundaries.ResidueClass.LocalProved
+import GoldbachBoundaries.ResidueClass.TwoBoundary
 import GoldbachBoundaries.T0HInf.SectorBoundary

@@ -1,4 +1,5 @@
 import GoldbachBoundaries.ResidueClass.HigherReduction
+import GoldbachBoundaries.ResidueClass.ExceptionalHigher
 
 /-! # Natural boundary theorems for Goldbach series in residue class one -/
 

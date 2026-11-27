@@ -56,17 +56,19 @@ theorem exists_logDeriv_primitive_local_bound (hZ3 : Paper2.Z3) (hLocal : LogDer
 /-- Away from the strip zeros by distance at least `d`, the local formula
 bounds the primitive logarithmic derivative by its remainder plus the
 Jensen mass bound divided by `d`. -/
-theorem exists_norm_logDeriv_primitive_le_of_separated (hGRH : GRH q) (hZ3 : Paper2.Z3)
+theorem exists_norm_logDeriv_primitive_le_of_separated_of_high_critical {T : ℝ}
+    (hline : ∀ (χ : DirichletCharacter ℂ q) ρ, ρ ∈ primitiveZeros χ →
+      T ≤ |ρ.im| → ρ.re = 1 / 2) (hZ3 : Paper2.Z3)
     (hLocal : LogDerivPrimitiveLocal q) :
-    ∃ A B T₀ : ℝ, 0 ≤ A ∧ 0 ≤ B ∧ 2 ≤ T₀ ∧
+    ∃ A B T₀ : ℝ, 0 ≤ A ∧ 0 ≤ B ∧ 2 ≤ T₀ ∧ T + 1 ≤ T₀ ∧
       ∀ (χ : DirichletCharacter ℂ q) (z : ℂ) (d : ℝ), 0 < d → 0 < z.re → z.re ≤ 2 →
         T₀ ≤ |z.im| → primitiveL χ z ≠ 0 →
         (∀ ρ ∈ primitiveZeros χ, |ρ.im - z.im| ≤ 1 → d ≤ ‖z - ρ‖) →
         ‖logDeriv (primitiveL χ) z‖ ≤ A * Real.log (2 + |z.im|) + B * Real.log (|z.im| + 4) / d := by
   classical
   obtain ⟨A, T₀, hA, hT, hlocal⟩ := exists_logDeriv_primitive_local_bound hZ3 hLocal
-  obtain ⟨B, hB, hmass⟩ := exists_primitive_unit_radius_mass_bound hGRH
-  refine ⟨A, B, T₀, hA, hB, hT, fun χ z d hd hz₀ hz₂ hz hne hdist ↦ ?_⟩
+  obtain ⟨B, hB, hmass⟩ := exists_primitive_unit_radius_mass_bound_of_high_critical hline
+  refine ⟨A, B, max T₀ (T + 1), hA, hB, hT.trans (le_max_left _ _), le_max_right _ _, fun χ z d hd hz₀ hz₂ hz hne hdist ↦ ?_⟩
   let W : Set ℂ := {ρ ∈ primitiveZeros χ | |ρ.im - z.im| ≤ 1}
   have hW : W.Finite := by
     refine (finite_zeroWindow χ (z.im - 1) (z.im + 1)).subset fun ρ hρ ↦ ?_
@@ -80,10 +82,21 @@ theorem exists_norm_logDeriv_primitive_le_of_separated (hGRH : GRH q) (hZ3 : Pap
       have hρW := hW.mem_toFinset.mp hρ
       rw [norm_div, Complex.norm_natCast]
       exact div_le_div_of_nonneg_left (by positivity) hd (hdist ρ hρW.1 hρW.2)
-    exact hsum.trans (div_le_div_of_nonneg_right (hmass χ z.im) hd.le)
+    exact hsum.trans (div_le_div_of_nonneg_right (hmass χ z.im ((le_max_right _ _).trans hz)) hd.le)
   calc
     _ = ‖(logDeriv (primitiveL χ) z - Q) + Q‖ := by rw [sub_add_cancel]
     _ ≤ ‖logDeriv (primitiveL χ) z - Q‖ + ‖Q‖ := norm_add_le _ _
-    _ ≤ _ := add_le_add (hlocal χ z hz₀ hz₂ hz hne) hQ
+    _ ≤ _ := add_le_add (hlocal χ z hz₀ hz₂ ((le_max_left _ _).trans hz) hne) hQ
+
+theorem exists_norm_logDeriv_primitive_le_of_separated (hGRH : GRH q) (hZ3 : Paper2.Z3)
+    (hLocal : LogDerivPrimitiveLocal q) :
+    ∃ A B T₀ : ℝ, 0 ≤ A ∧ 0 ≤ B ∧ 2 ≤ T₀ ∧
+      ∀ (χ : DirichletCharacter ℂ q) (z : ℂ) (d : ℝ), 0 < d → 0 < z.re → z.re ≤ 2 →
+        T₀ ≤ |z.im| → primitiveL χ z ≠ 0 →
+        (∀ ρ ∈ primitiveZeros χ, |ρ.im - z.im| ≤ 1 → d ≤ ‖z - ρ‖) →
+        ‖logDeriv (primitiveL χ) z‖ ≤ A * Real.log (2 + |z.im|) + B * Real.log (|z.im| + 4) / d := by
+  obtain ⟨A, B, T₀, hA, hB, hT, _, h⟩ := exists_norm_logDeriv_primitive_le_of_separated_of_high_critical
+    (T := 0) (fun χ ρ hρ _ ↦ hGRH χ ρ hρ) hZ3 hLocal
+  exact ⟨A, B, T₀, hA, hB, hT, h⟩
 
 end GoldbachBoundaries.ResidueClass
