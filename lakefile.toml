@@ -6,12 +6,10 @@ pp.unicode.fun = true
 autoImplicit = false
 relaxedAutoImplicit = false
 
-# PrimeNumberTheoremAnd (PNT+), pinned to a fixed commit; it fixes the Mathlib pin (v4.34.0).
-# Bump deliberately, when PNT+ bumps.
 [[require]]
-name = "PrimeNumberTheoremAnd"
-git = "https://github.com/AlexKontorovich/PrimeNumberTheoremAnd.git"
-rev = "c39a751132c88b6e8080b74c74023fd95b3d8be0"
+name = "Zeta"
+git = "https://github.com/smmercuri/zeta"
+rev = "4704234df2d97563936adcaf0b89e2f8955389f9"
 
 [[lean_lib]]
 name = "GoldbachBoundaries"

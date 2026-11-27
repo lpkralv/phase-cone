@@ -39,6 +39,16 @@ Project declaration names have the prefix `GoldbachBoundaries.` This README omit
 | Proposition 4.2, unrestricted normal limit | `PhiRProof.phiR_sub_main_radial_limit`, with `PhiRProof.PhiRc_sub_phiRMain` | [PhiR/RealPoint.lean](../GoldbachBoundaries/PhiR/RealPoint.lean) |
 | Corollary 4.3, positive unrestricted real limit | `PhiRProof.phiR_sub_main_real_limit` | [PhiR/RealPoint.lean](../GoldbachBoundaries/PhiR/RealPoint.lean) |
 
+
+| Unsubtracted real-point limit, RH, Z2, Z3 and `r ≥ 2` | `PhiRProof.phiR_real_limit` | [UnsubtractedRealLimit.lean](../GoldbachBoundaries/PhiR/UnsubtractedRealLimit.lean) |
+| Zero sum and positivity, RH and Z2 for positivity | `PhiRProof.muZero`, `PhiRProof.muZero_pos` | [UnsubtractedRealLimit.lean](../GoldbachBoundaries/PhiR/UnsubtractedRealLimit.lean) |
+| Conditional bound and negative limit, H14 and HN; RH, Z2, Z3 and `2 ≤ r ≤ 4 × 10^15` for the limit | `PhiRProof.muZero_lt`, `PhiRProof.phiR_real_limit_neg`, `PhiRProof.phiR_tendsto_negative_real` | [UnsubtractedSign.lean](../GoldbachBoundaries/PhiR/UnsubtractedSign.lean) |
+| Four low zeros through height 32, unconditional | `PhiRProof.ReleaseLowZeros`, `PhiRProof.releaseLowZeros_proved` | [LowZerosSpec.lean](../GoldbachBoundaries/PhiR/LowZerosSpec.lean), [ReleaseBridge.lean](../GoldbachBoundaries/LowZeros/ReleaseBridge.lean) |
+| Conditional threshold gap and nonzero limit, RH, Z2, `ReleaseLowZeros` and HN; Z3 and `r ≥ 2` for the limit | `PhiRProof.rStar_gap`, `PhiRProof.phiR_real_limit_ne_zero` | [UnsubtractedGap.lean](../GoldbachBoundaries/PhiR/UnsubtractedGap.lean) |
+| D0 identity, RH | `PhiRProof.d0_identity` | [D0Tail.lean](../GoldbachBoundaries/PhiR/D0Tail.lean) |
+| Threshold gap, RH, Z2 and `ReleaseLowZeros` | `PhiRProof.rStar_gap_RH` | [D0Tail.lean](../GoldbachBoundaries/PhiR/D0Tail.lean) |
+| Unsubtracted limit exists and is nonzero, RH, Z2, Z3 and `r ≥ 2` | `PhiRProof.phiR_tendsto_ne_zero` | [UnsubtractedFinal.lean](../GoldbachBoundaries/PhiR/UnsubtractedFinal.lean) |
+
 ## Definitions and premises
 
 - `ResidueClass.Phi2 q` and `ResidueClass.PhiR q r` are the binary and `r`-fold class-one Goldbach series. [Definitions.lean](../GoldbachBoundaries/ResidueClass/Definitions.lean)
@@ -51,6 +61,7 @@ Project declaration names have the prefix `GoldbachBoundaries.` This README omit
 - RH (`RiemannHypothesis` in Mathlib) places every nontrivial zeta zero on `Re z = 1/2`.
 - Z2 (`Paper2.Z2`) gives the Riemann–von Mangoldt count with logarithmic error and a logarithmic bound on multiplicity in unit height intervals.
 - Z3 (`Paper2.Z3`) gives a local expansion of `ζ′/ζ` in terms of zeros within one unit of the height, with a uniform logarithmic error for `−1 ≤ Re z ≤ 2` and `|Im z| ≥ 2`, away from zeros.
+- H14 (`PhiRProof.H14`) places every nontrivial zeta zero at absolute ordinate greater than 14. HN (`PhiRProof.HN`) bounds the zero count by `T² / 8` for `T ≥ 14`.
 - `ResidueClass.LogDerivPrimitiveLocal q` gives a local expansion of `L′/L` in terms of strip zeros within one unit of the height. For `0 < Re z ≤ 2` and sufficiently large `|Im z|`, away from zeros, the logarithmic error is uniform over the primitive functions inducing nonprincipal characters modulo `q`.
 - Littlewood's gap estimate (`Paper2.ZLittlewood`) places a zeta-zero ordinate within `O(1 / log log log t)` of each sufficiently large positive height `t`.
 - Stirling on strips (`Phi2HInf.StirlingStrip`) gives a uniform relative error of order `1 / |Im z|` in the leading Gamma approximation on every fixed vertical strip at large absolute height.
@@ -67,7 +78,7 @@ This premise summary describes the results in prose. The paper's appendix gives 
 
 ## Scope
 
-The separate deduction at `q = 2`, the comparisons with Rüppel's formulas, the remarks on the unsubtracted real limit and the numerical enclosure lie outside the formal statements. The two positive real-point formulas use squared Gamma norms. The unrestricted every-ordinate limit uses a possibly complex atom summed over ordered zero pairs, with products of Gamma values. The private lemma `Phi2Proof.norm_Gamma_half_sq` proves the pointwise Gamma identity used in the hyperbolic-cosine reformulation. [norm_bKer.lean](../GoldbachBoundaries/Phi2/Fill/norm_bKer.lean)
+The separate deduction at `q = 2` and the comparisons with Rüppel's formulas lie outside the formal statements. The paper's numerical enclosure of `r_*` in the section on real-point limits is now checked in Lean; the paper text will be updated in its next revision. The final theorem gives a negative limit for `2 ≤ r ≤ 5639249912025015212` and a positive limit for `r ≥ 5639249912025015213`. The two positive real-point formulas use squared Gamma norms. The unrestricted every-ordinate limit uses a possibly complex atom summed over ordered zero pairs, with products of Gamma values. The private lemma `Phi2Proof.norm_Gamma_half_sq` proves the pointwise Gamma identity used in the hyperbolic-cosine reformulation. [norm_bKer.lean](../GoldbachBoundaries/Phi2/Fill/norm_bKer.lean)
 
 The higher-fold reduction uses the private helpers `ResidueClass.higherRemainder`, `ResidueClass.differentiableOn_higherRemainder`, `ResidueClass.analyticAt_higherCoefficient`, `ResidueClass.higherCoefficient_ne_zero` and `ResidueClass.meromorphicOn_higherCorrection`. [HigherReduction.lean](../GoldbachBoundaries/ResidueClass/HigherReduction.lean)
 

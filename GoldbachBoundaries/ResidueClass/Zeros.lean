@@ -123,9 +123,9 @@ private theorem hasResidue_negLogDeriv_lFunction {s : ℂ} (hs : 0 < s.re) (hs�
   rw [analyticOrderNatAt_lFunction_eq_primitiveMult χ hs hs₁] at heq
   exact (hasResidue_logDeriv_of_analyticOrderAt ha heq.symm).neg
 
+open scoped Classical in
 private theorem hasResidue_negLogDeriv_lFunction_one :
     HasResidue (fun z ↦ -logDeriv χ.LFunction z) 1 (if χ = 1 then 1 else 0) := by
-  classical
   by_cases hχ : χ = 1
   · subst χ
     simp only [ite_true]
@@ -170,7 +170,7 @@ private theorem hasResidue_D_of_character_residues {s : ℂ} {c : DirichletChara
 /-- The principal term contributes residue `1 / φ(q)` at one. -/
 theorem hasResidue_D_one : HasResidue (D q) 1 (q.totient : ℂ)⁻¹ := by
   classical
-  simpa using hasResidue_D_of_character_residues (fun χ ↦
+  simpa using hasResidue_D_of_character_residues (q := q) (s := 1) (fun χ ↦
     hasResidue_negLogDeriv_lFunction_one χ)
 
 /-- At positive real part away from one, the residue of the character average

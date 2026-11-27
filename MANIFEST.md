@@ -1,6 +1,6 @@
 # Lean source manifest
 
-The three papers cite declarations in 41 local source modules. Following their imports yields 652 modules, plus the new `GoldbachBoundaries` entry point. The three `Check.lean` files are separate check programs.
+The three paper maps cite declarations in 48 local source modules. Following their imports yields 654 modules, plus the `GoldbachBoundaries` entry point. The three `Check.lean` files are separate check programs.
 
 The Lake toolchain and dependency lockfile match the source project. The release configuration lists `GoldbachBoundaries` as its only library and default target. The copied Lean modules keep their paths, declarations and proofs. Release edits remove private references from source comments.
 
@@ -8,16 +8,17 @@ The Lake toolchain and dependency lockfile match the source project. The release
 | --- | ---: | ---: |
 | [phase-cone](phase-cone/README.md) | 8 | 487 |
 | [t0-boundary](t0-boundary/README.md) | 14 | 626 |
-| [class-one](class-one/README.md) | 30 | 623 |
+| [class-one](class-one/README.md) | 37 | 638 |
 
 | Source group under `GoldbachBoundaries/` | Modules |
 | --- | ---: |
 | `(top level)` | 11 |
+| `LowZeros` | 9 |
 | `Paper2` | 387 |
 | `PhaseCone` | 2 |
 | `Phi2` | 45 |
 | `Phi2HInf` | 45 |
-| `PhiR` | 25 |
+| `PhiR` | 31 |
 | `ResidueClass` | 25 |
 | `T0HInf` | 31 |
 | `TIdentity` | 17 |
@@ -29,11 +30,20 @@ The Lake toolchain and dependency lockfile match the source project. The release
 
 | Module | Phase cone | T₀ boundary | Class one |
 | --- | :---: | :---: | :---: |
-| [`GoldbachBoundaries`](GoldbachBoundaries.lean) | | | |
+| [`GoldbachBoundaries`](GoldbachBoundaries.lean) |  |  |  |
 | [`GoldbachBoundaries.BoundaryLemma`](GoldbachBoundaries/BoundaryLemma.lean) | ✓ | ✓ | ✓ |
 | [`GoldbachBoundaries.Defs`](GoldbachBoundaries/Defs.lean) | ● | ● | ● |
 | [`GoldbachBoundaries.Density`](GoldbachBoundaries/Density.lean) | ✓ | ✓ | ✓ |
 | [`GoldbachBoundaries.LogDerivZeta`](GoldbachBoundaries/LogDerivZeta.lean) | ✓ | ✓ | ● |
+| [`GoldbachBoundaries.LowZeros.Brackets`](GoldbachBoundaries/LowZeros/Brackets.lean) |  |  | ✓ |
+| [`GoldbachBoundaries.LowZeros.Endpoints`](GoldbachBoundaries/LowZeros/Endpoints.lean) |  |  | ✓ |
+| [`GoldbachBoundaries.LowZeros.Gram`](GoldbachBoundaries/LowZeros/Gram.lean) |  |  | ✓ |
+| [`GoldbachBoundaries.LowZeros.LowZeros`](GoldbachBoundaries/LowZeros/LowZeros.lean) |  |  | ✓ |
+| [`GoldbachBoundaries.LowZeros.ReleaseBridge`](GoldbachBoundaries/LowZeros/ReleaseBridge.lean) |  |  | ● |
+| [`GoldbachBoundaries.LowZeros.TailEM`](GoldbachBoundaries/LowZeros/TailEM.lean) |  |  | ✓ |
+| [`GoldbachBoundaries.LowZeros.TailRS1`](GoldbachBoundaries/LowZeros/TailRS1.lean) |  |  | ✓ |
+| [`GoldbachBoundaries.LowZeros.TailRS2`](GoldbachBoundaries/LowZeros/TailRS2.lean) |  |  | ✓ |
+| [`GoldbachBoundaries.LowZeros.TailRS3`](GoldbachBoundaries/LowZeros/TailRS3.lean) |  |  | ✓ |
 | [`GoldbachBoundaries.Paper2.Defs`](GoldbachBoundaries/Paper2/Defs.lean) | ✓ | ● | ● |
 | [`GoldbachBoundaries.Paper2.M1.Assembly`](GoldbachBoundaries/Paper2/M1/Assembly.lean) | ✓ | ✓ | ✓ |
 | [`GoldbachBoundaries.Paper2.M1.BNumbers`](GoldbachBoundaries/Paper2/M1/BNumbers.lean) | ✓ | ✓ | ✓ |
@@ -513,6 +523,7 @@ The Lake toolchain and dependency lockfile match the source project. The release
 | [`GoldbachBoundaries.Phi2HInf.Proof.RMellin`](GoldbachBoundaries/Phi2HInf/Proof/RMellin.lean) |  | ✓ | ✓ |
 | [`GoldbachBoundaries.Phi2HInf.Proof.Ratio`](GoldbachBoundaries/Phi2HInf/Proof/Ratio.lean) | ✓ | ✓ | ✓ |
 | [`GoldbachBoundaries.Phi2HInf.Statements`](GoldbachBoundaries/Phi2HInf/Statements.lean) |  | ✓ | ✓ |
+| [`GoldbachBoundaries.PhiR.D0Tail`](GoldbachBoundaries/PhiR/D0Tail.lean) |  |  | ● |
 | [`GoldbachBoundaries.PhiR.Defs`](GoldbachBoundaries/PhiR/Defs.lean) |  | ✓ | ● |
 | [`GoldbachBoundaries.PhiR.Fill.BCommon`](GoldbachBoundaries/PhiR/Fill/BCommon.lean) |  | ✓ | ✓ |
 | [`GoldbachBoundaries.PhiR.Fill.Gamma_mul_PhiR_split`](GoldbachBoundaries/PhiR/Fill/Gamma_mul_PhiR_split.lean) |  | ✓ | ✓ |
@@ -530,6 +541,7 @@ The Lake toolchain and dependency lockfile match the source project. The release
 | [`GoldbachBoundaries.PhiR.Fill.norm_QR_le`](GoldbachBoundaries/PhiR/Fill/norm_QR_le.lean) |  | ✓ | ✓ |
 | [`GoldbachBoundaries.PhiR.Fill.riemannZeta_ne_zero_of_re_eq_zero`](GoldbachBoundaries/PhiR/Fill/riemannZeta_ne_zero_of_re_eq_zero.lean) |  | ✓ | ✓ |
 | [`GoldbachBoundaries.PhiR.Fill.tendsto_eta_Phi2c`](GoldbachBoundaries/PhiR/Fill/tendsto_eta_Phi2c.lean) |  | ✓ | ✓ |
+| [`GoldbachBoundaries.PhiR.LowZerosSpec`](GoldbachBoundaries/PhiR/LowZerosSpec.lean) |  |  | ● |
 | [`GoldbachBoundaries.PhiR.Proof.Defs`](GoldbachBoundaries/PhiR/Proof/Defs.lean) |  | ✓ | ● |
 | [`GoldbachBoundaries.PhiR.Proof.M1Mellin`](GoldbachBoundaries/PhiR/Proof/M1Mellin.lean) |  | ✓ | ✓ |
 | [`GoldbachBoundaries.PhiR.Proof.M2Continuation`](GoldbachBoundaries/PhiR/Proof/M2Continuation.lean) |  | ✓ | ✓ |
@@ -538,6 +550,10 @@ The Lake toolchain and dependency lockfile match the source project. The release
 | [`GoldbachBoundaries.PhiR.Proof.M5Radial`](GoldbachBoundaries/PhiR/Proof/M5Radial.lean) |  | ✓ | ✓ |
 | [`GoldbachBoundaries.PhiR.RealPoint`](GoldbachBoundaries/PhiR/RealPoint.lean) |  |  | ● |
 | [`GoldbachBoundaries.PhiR.Statement`](GoldbachBoundaries/PhiR/Statement.lean) |  | ✓ | ✓ |
+| [`GoldbachBoundaries.PhiR.UnsubtractedFinal`](GoldbachBoundaries/PhiR/UnsubtractedFinal.lean) |  |  | ● |
+| [`GoldbachBoundaries.PhiR.UnsubtractedGap`](GoldbachBoundaries/PhiR/UnsubtractedGap.lean) |  |  | ● |
+| [`GoldbachBoundaries.PhiR.UnsubtractedRealLimit`](GoldbachBoundaries/PhiR/UnsubtractedRealLimit.lean) |  |  | ● |
+| [`GoldbachBoundaries.PhiR.UnsubtractedSign`](GoldbachBoundaries/PhiR/UnsubtractedSign.lean) |  |  | ● |
 | [`GoldbachBoundaries.ResidueAPI`](GoldbachBoundaries/ResidueAPI.lean) | ✓ | ✓ | ✓ |
 | [`GoldbachBoundaries.ResidueClass.BinaryBoundary`](GoldbachBoundaries/ResidueClass/BinaryBoundary.lean) |  |  | ● |
 | [`GoldbachBoundaries.ResidueClass.BinaryContinuation`](GoldbachBoundaries/ResidueClass/BinaryContinuation.lean) |  |  | ● |

@@ -1,5 +1,9 @@
 import GoldbachBoundaries.PhaseCone.SectorPoly
 import GoldbachBoundaries.PhiR.RealPoint
+import GoldbachBoundaries.PhiR.UnsubtractedRealLimit
+import GoldbachBoundaries.PhiR.UnsubtractedSign
+import GoldbachBoundaries.PhiR.UnsubtractedGap
+import GoldbachBoundaries.PhiR.UnsubtractedFinal
 import GoldbachBoundaries.ResidueClass.RealPoint
 import GoldbachBoundaries.ResidueClass.Statement
 
@@ -46,3 +50,23 @@ import GoldbachBoundaries.ResidueClass.Statement
 #print axioms GoldbachBoundaries.ResidueClass.meromorphicOrderAt_D_one
 #print axioms GoldbachBoundaries.ResidueClass.meromorphic_D
 #print axioms GoldbachBoundaries.ResidueClass.primitiveL_ne_zero_of_one_le_re
+#print axioms GoldbachBoundaries.PhiRProof.muZero_pos
+#print axioms GoldbachBoundaries.PhiRProof.phiR_real_limit
+#print axioms GoldbachBoundaries.PhiRProof.muZero_lt
+#print axioms GoldbachBoundaries.PhiRProof.phiR_real_limit_neg
+#print axioms GoldbachBoundaries.PhiRProof.phiR_tendsto_negative_real
+#print axioms GoldbachBoundaries.PhiRProof.muZero_mem
+#print axioms GoldbachBoundaries.PhiRProof.rStar_gap
+#print axioms GoldbachBoundaries.PhiRProof.phiR_real_limit_ne_zero
+#print axioms GoldbachBoundaries.PhiRProof.tsum_zeroWeight_abs_tail_eq_two_mul_positive
+#print axioms GoldbachBoundaries.PhiRProof.exp_neg_pi_mul_32_lt
+#print axioms GoldbachBoundaries.PhiRProof.muZero_mem_of_positive_tail
+#print axioms GoldbachBoundaries.PhiRProof.rStar_gap_of_muZero_mem
+#print axioms GoldbachBoundaries.PhiRProof.phiR_real_limit_ne_zero_of_gap
+#print axioms GoldbachBoundaries.PhiRProof.d0_identity
+#print axioms GoldbachBoundaries.PhiRProof.tail_above_32_of_RH
+#print axioms GoldbachBoundaries.PhiRProof.rStar_gap_RH
+#print axioms GoldbachBoundaries.PhiRProof.phiR_real_limit_ne_zero_RH
+#print axioms GoldbachBoundaries.PhiRProof.phiR_tendsto_ne_zero_RH
+#print axioms GoldbachBoundaries.PhiRProof.releaseLowZeros_proved
+#print axioms GoldbachBoundaries.PhiRProof.phiR_tendsto_ne_zero

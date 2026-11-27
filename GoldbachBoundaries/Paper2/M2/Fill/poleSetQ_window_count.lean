@@ -31,7 +31,8 @@ theorem poleSetQ_window_count (hZ1 : Z1) (hZ2 : Z2) {ε : ℝ} (hε : 0 < ε) (h
   have hN1 : 1 ≤ N := by omega
   let R : Set ℂ := (fun n : ℕ => 1 / (n : ℂ)) '' (Finset.range N : Set ℕ)
   have hRf : R.Finite := (Finset.finite_toSet _).image _
-  have hRc : R.ncard ≤ N := (Set.ncard_image_le (Finset.finite_toSet _)).trans (by simp)
+  have hRc : R.ncard ≤ N := (Set.ncard_image_le (Finset.finite_toSet _)).trans
+    (by simp only [Set.ncard_coe_finset, Finset.card_range, le_refl])
   refine ⟨N / Real.log 3 + N * B, fun t => ?_⟩
   let T : ℕ → Set ℂ := fun n => {ρ | ρ ∈ NontrivialZeros ∧ (n : ℝ) * t ≤ ρ.im ∧ ρ.im ≤ (n : ℝ) * t + n}
   let S : ℕ → Set ℂ := fun n => if n = 0 then ∅ else (fun ρ : ℂ => ρ / (n : ℂ)) '' T n

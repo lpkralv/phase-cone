@@ -28,7 +28,7 @@ lemma integral_primeSquare {z : ℂ} (hz : 1 / 2 < z.re) :
       (∫ x in Ioc (0 : ℝ) 1, primeSquareCoef * (x : ℂ) ^ (-(1 / 2 : ℂ)) * (x : ℂ) ^ (z - 1)) =
         primeSquareCoef / (z - 1 / 2) := by
   have h := Phi2HInf.integral_cpow_family (ι := Unit) (fun _ => primeSquareCoef)
-    (fun _ => (1 / 2 : ℂ)) (r := 1 / 2) (by exact summable_of_finite_support (Set.toFinite _))
+    (fun _ => (1 / 2 : ℂ)) (r := 1 / 2) ((hasSum_fintype _).summable)
     (fun _ => by norm_num) hz
   simpa using h
 

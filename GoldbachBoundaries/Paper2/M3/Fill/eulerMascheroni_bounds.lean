@@ -232,8 +232,8 @@ private lemma euler_maclaurin_bound (n : ℕ) (hn : 1 ≤ n) :
 /-- Computational verification: `γ₂ 16 ≤ 0.577216`, using `log 2 > 0.6931471803`. -/
 private lemma euler_maclaurin_numerical : γ₂ 16 ≤ 0.577216 := by
   norm_num [γ₂]
-  rw [show (16 : ℝ) = 2 ^ 4 by norm_num]
-  grind [Real.log_pow, Real.log_two_gt_d9]
+  rw [show (16 : ℝ) = 2 ^ 4 by norm_num, Real.log_pow]
+  linarith only [Real.log_two_gt_d9]
 
 lemma hγ_hi : Real.eulerMascheroniConstant ≤ 0.577216 :=
   le_of_lt (lt_of_lt_of_le (euler_maclaurin_bound 16 (by norm_num)) (by grind [euler_maclaurin_numerical]))
